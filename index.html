@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado - Sem Tempo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --text: #1e293b;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--background); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .card { margin-bottom: 25px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .opcoes { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        
+        .opcao { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 12px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .opcao:hover { background-color: #f1f5f9; }
+        
+        .opcao.correta { background-color: #dcfce7 !important; border-color: var(--success) !important; color: #14532d; font-weight: bold; }
+        .opcao.errada { background-color: #fee2e2 !important; border-color: var(--danger) !important; color: #7f1d1d; }
+        .opcao.desativada { pointer-events: none; opacity: 0.6; }
+        .opcao.desativada.correta { opacity: 1; }
+
+        #feedback-texto { font-weight: bold; margin-top: 15px; font-size: 1.1rem; }
+        .txt-sucesso { color: var(--success); }
+        .txt-perigo { color: var(--danger); }
+
+        button { background-color: var(--primary); color: white; border: none; padding: 12px 24px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 15px; }
+        button:hover { opacity: 0.9; }
+        .resultado-status { font-size: 2rem; font-weight: bold; margin: 20px 0; }
+        .aprovado { color: var(--success); }
+        .reprovado { color: var(--danger); }
+        .progresso { font-size: 1rem; color: #64748b; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="tela-inicio">
+        <h2>Simulado Sem Limite de Tempo</h2>
+        <p>Estude no seu próprio ritmo com correção instantânea.</p>
+        <ul>
+            <li><strong>Total de questões:</strong> 233</li>
+            <li>⏱️ <strong>Tempo:</strong> Livre (Sem cronômetro)</li>
+            <li>📉 <strong>Margem de erro:</strong> 20% (Máximo de 46 erros)</li>
+        </ul>
+        <button onclick="iniciarExame()">Começar Treino</button>
+    </div>
+
+    <div id="tela-exame" style="display: none;">
+        <header>
+            <div class="progresso">Questão <span id="num-atual">1</span> de <span id="total-questoes">233</span></div>
+        </header>
+        <div class="card">
+            <h3 id="enunciado">Carregando...</h3>
+            <div class="opcoes" id="bloco-opcoes"></div>
+            <div id="feedback-texto"></div>
+        </div>
+        <button id="btn-acao" onclick="verificarOuAvancar()">Confirmar Resposta</button>
+    </div>
+
+    <div id="tela-resultado" style="display: none;">
+        <h2>Resultado do Treino</h2>
+        <div id="status-final" class="resultado-status"></div>
+        <p id="detalhes-resultado"></p>
+        <button onclick="location.reload()">Reiniciar do Início</button>
+    </div>
+</div>
+
+<script>
+    const perguntas = [];
+    const bancoTopicos = [
+        { p: "Qual é a conduta correta perante o sinal de STOP?", o: ["Avançar com cuidado reduzindo a velocidade", "Parar obrigatoriamente antes do cruzamento", "Ceder passagem apenas aos veículos da direita"], c: 1 },
+        { p: "A distância de reação de um condutor aumenta sob o efeito de:", o: ["Fadiga ou consumo de álcool", "Pneus devidamente calibrados", "Condução em velocidade reduzida"], c: 0 },
+        { p: "A velocidade máxima permitida para automóveis ligeiros de passageiros em autoestradas é de:", o: ["90 km/h", "100 km/h", "120 km/h"], c: 2 },
+        { p: "A sinalização de perigo serve para indicar ao condutor:", o: ["A proximidade de um local que exige especial precaução", "Uma proibição absoluta de circular", "Uma obrigação de mudar de direção"], c: 0 },
+        { p: "Em caso de forte nevoeiro, o condutor deve acender as luzes de:", o: ["Máximos", "Presença apenas", "Nevoeiro (ou médios se não equipado)"], c: 2 },
+        { p: "O uso do cinto de segurança é obrigatório para:", o: ["Apenas o condutor", "Condutor e todos os passageiros", "Apenas passageiros dos bancos dianteiros"], c: 1 },
+        { p: "O que indica a luz amarela fixa de um semáforo?", o: ["Obrigação de parar, a menos que não o consiga fazer em segurança", "Permissão para acelerar e passar rápido", "Paragem imediata e absoluta sob qualquer condição"], c: 0 }
+    ];
+
+    for (let i = 1; i <= 233; i++) {
+        const modelo = bancoTopicos[(i - 1) % bancoTopicos.length];
+        perguntas.push({ id: i, pergunta: `Questão ${i}: ${modelo.p}`, opcoes: [...modelo.o], correta: modelo.c });
+    }
+
+    let questoesDoExame = [];
+    let indiceAtual = 0;
+    let erros = 0;
+    let acertos = 0;
+    let respondeuQuestaoAtual = false;
+
+    function iniciarExame() {
+        questoesDoExame = [...perguntas].sort(() => 0.5 - Math.random());
+        document.getElementById('total-questoes').innerText = questoesDoExame.length;
+        document.getElementById('tela-inicio').style.display = 'none';
+        document.getElementById('tela-exame').style.display = 'block';
+        carregarQuestao();
+    }
+
+    function carregarQuestao() {
+        respondeuQuestaoAtual = false;
+        const q = questoesDoExame[indiceAtual];
+        document.getElementById('num-atual').innerText = indiceAtual + 1;
+        document.getElementById('enunciado').innerText = q.pergunta;
+        document.getElementById('feedback-texto').innerText = '';
+        
+        const btn = document.getElementById('btn-acao');
+        btn.innerText = "Confirmar Resposta";
+
+        const blocoOpcoes = document.getElementById('bloco-opcoes');
+        blocoOpcoes.innerHTML = '';
+        
+        q.opcoes.forEach((opcao, index) => {
+            blocoOpcoes.innerHTML += `
+                <label class="opcao" id="opt-${index}">
+                    <input type="radio" name="opcao" value="${index}">
+                    ${opcao}
+                </label>
+            `;
+        });
+    }
+
+    function verificarOuAvancar() {
+        if (!respondeuQuestaoAtual) {
+            const selecionada = document.querySelector('input[name="opcao"]:checked');
+            if (!selecionada) { alert("Selecione uma opção."); return; }
+
+            respondeuQuestaoAtual = true;
+            const respostaUser = parseInt(selecionada.value);
+            const q = questoesDoExame[indiceAtual];
+            const feedback = document.getElementById('feedback-texto');
+
+            document.querySelectorAll('.opcao').forEach((el, index) => {
+                el.classList.add('desativada');
+                if (index === q.correta) el.classList.add('correta');
+            });
+
+            if (respostaUser === q.correta) {
+                acertos++;
+                feedback.innerHTML = "<span class='txt-sucesso'>✨ Certo!</span>";
+            } else {
+                erros++;
+                document.getElementById(`opt-${respostaUser}`).classList.add('errada');
+                feedback.innerHTML = "<span class='txt-perigo'>❌ Errado! Resposta certa em verde.</span>";
+            }
+
+            const btn = document.getElementById('btn-acao');
+            if (indiceAtual === questoesDoExame.length - 1) {
+                btn.innerText = "Finalizar Simulado";
+            } else {
+                btn.innerText = "Próxima Questão";
+            }
+        } else {
+            if (indiceAtual < questoesDoExame.length - 1) {
+                indiceAtual++;
+                carregarQuestao();
+            } else {
+                finalizarExame();
+            }
+        }
+    }
+
+    function finalizarExame() {
+        document.getElementById('tela-exame').style.display = 'none';
+        document.getElementById('tela-resultado').style.display = 'block';
+
+        const totalQuestoes = questoesDoExame.length;
+        const maxErrosPermitidos = Math.floor(totalQuestoes * 0.20);
+        const aprovado = erros <= maxErrosPermitidos;
+
+        const statusFinal = document.getElementById('status-final');
+        if (aprovado) {
+            statusFinal.innerText = "🎉 Aprovado(a)!";
+            statusFinal.className = "resultado-status aprovado";
+        } else {
+            statusFinal.innerText = "❌ Reprovado(a)";
+            statusFinal.className = "resultado-status reprovado";
+        }
+
+        document.getElementById('detalhes-resultado').innerHTML = `
+            Você respondeu todas as <strong>${totalQuestoes} questões</strong>.<br><br>
+            ✅ Acertos: <strong>${acertos}</strong><br>
+            ❌ Erros: <strong>${erros}</strong> (Margem máxima permitida: ${maxErrosPermitidos} erros).
+        `;
+    }
+</script>
+</body>
+</html>
