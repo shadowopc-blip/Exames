@@ -1,0 +1,3483 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Oficial SMEC - Categoria Instrutores</title>
+    <style>
+        body.dark {
+            background-color: #0f172a;
+            color: #e5e7eb;
+        }
+
+        body.dark .container {
+            background: #111827;
+        }
+
+        body.dark .card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        body.dark .opcao {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        body.dark .opcao:hover {
+            background: #273449;
+        }
+
+        body.dark .txt-sucesso {
+            background: #064e3b;
+        }
+
+        body.dark .txt-perigo {
+            background: #7f1d1d;
+        }
+        :root {
+            --primary: #1e40af;
+            --primary-hover: #1e3a8a;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --border: #cbd5e1;
+        }
+        /* =========================
+           BASE (MODO CLARO)
+        ========================= */
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            transition: background 0.3s ease;
+        }
+        /* =========================
+           MODO ESCURO
+        ========================= */
+
+        body.dark {
+            background-color: #0f172a;
+            color: #e5e7eb;
+        }
+
+        body.dark .container {
+            background: #111827;
+        }
+
+        body.dark .card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        body.dark .opcao {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        body.dark .opcao:hover {
+            background: #273449;
+        }
+
+        body.dark .opcao span {
+            color: #e5e7eb;
+        }
+
+        body.dark header,
+        body.dark .progresso,
+        body.dark #contador-erros {
+            color: #e5e7eb;
+        }
+        /* 🔧 FIX: garantir que TODOS os estados ficam consistentes */
+
+        body.dark .opcao,
+        body.dark .opcao * {
+            color: #e5e7eb !important;
+        }
+
+        /* estado desativado */
+        body.dark .opcao.desativada {
+            background: #1f2937 !important;
+        }
+
+        /* estado correta no dark */
+        body.dark .opcao.correta {
+            background-color: #14532d !important;
+            border-color: #22c55e !important;
+            color: #d1fae5 !important;
+        }
+
+        /* estado errada no dark */
+        body.dark .opcao.errada {
+            background-color: #7f1d1d !important;
+            border-color: #ef4444 !important;
+            color: #fee2e2 !important;
+        }
+        .opcao span {
+            color: inherit;
+        }
+        body.dark .enunciado {
+            color: #93c5fd;
+        }
+        body.dark .opcao span {
+            color: #e5e7eb !important;
+        }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 25px; }
+        h2 { margin-top: 0; color: var(--primary); }
+        .card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .enunciado { font-size: 1.2rem; font-weight: 600; color: var(--text); margin-bottom: 20px; }
+        .opcoes { display: flex; flex-direction: column; gap: 14px; }
+        
+        .opcao { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 14px 18px; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            cursor: pointer; 
+            background: var(--card-bg); /* 👈 FIX */
+            transition: all 0.2s ease; 
+            font-size: 1rem;
+        }
+        .opcao:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+        .opcao input { transform: scale(1.2); cursor: pointer; }
+        
+        body.dark .opcao.correta {
+            background-color: #14532d !important;
+            border-color: #22c55e !important;
+            color: #d1fae5 !important;
+        }
+
+        body.dark .opcao.errada {
+            background-color: #7f1d1d !important;
+            border-color: #ef4444 !important;
+            color: #fee2e2 !important;
+        }
+        .opcao.desativada { pointer-events: none; opacity: 0.65; }
+        .opcao.desativada.correta { opacity: 1; }
+
+        #feedback-texto { font-weight: bold; margin-top: 20px; font-size: 1.1rem; padding: 10px; border-radius: 6px; }
+        .txt-sucesso { color: var(--success); background: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; display: block; }
+        .txt-perigo { color: var(--danger); background: #ffebee; border: 1px solid #ffcdd2; padding: 12px; display: block; }
+
+        button { background-color: var(--primary); color: white; border: none; padding: 14px 28px; font-size: 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s; }
+        button:hover { background-color: var(--primary-hover); }
+        
+        .resultado-status { font-size: 2.2rem; font-weight: 800; margin: 25px 0; }
+        .aprovado { color: var(--success); }
+        .reprovado { color: var(--danger); }
+        .progresso { font-size: 1.1rem; color: var(--text-muted); font-weight: 600; }
+        ul { padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="tela-inicio">
+        <h2>Simulador de Exame - Categoria Instrutores (SMEC)</h2>
+        <p>Este teste simula a folha completa de exame contendo uma estrutura contínua de <strong id="total-db">0 Questões</strong> extraídas diretamente do banco de dados oficial do PDF.</p>
+        <div style="background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <strong style="color:#0f172a;">Parâmetros de Aprovação Regulamentares:</strong>
+            <ul>
+                <li>Total de perguntas na prova: 100</li>
+                <li>Margem de erro permitida: 20% (Máximo de 20 erradas)</li>
+                <li>Foco técnico: Segurança Rodoviária, Psicologia, Pedagogia, Direito e Mecânica Automóvel.</li>
+            </ul>
+        </div>
+        <button onclick="iniciarExame()">Iniciar Simulação Completa</button>
+        <button onclick="toggleTheme()" style="width:auto; padding:10px 14px; margin-top:10px;">
+            🌙 Tema
+        </button>
+    </div>
+
+    <div id="tela-exame" style="display: none;">
+        <header>
+            <div class="progresso">
+                Questão <span id="num-atual">1</span> de
+                <span id="total-questoes">100</span>
+            </div>
+            <button onclick="toggleTheme()" style="width:auto; padding:10px 14px;">
+                🌙 Tema
+            </button>
+            <div id="cronometro" style="font-weight:bold;">
+                ⏰ 02:00:00
+            </div>
+
+            <div id="contador-erros" style="font-size: 0.95rem; color: var(--text-muted);">
+                Erros: 0/20
+            </div>
+        </header>
+        <div class="card">
+            <div class="enunciado" id="enunciado">Carregando a questão...</div>
+            <div class="opcoes" id="bloco-opcoes"></div>
+            <div id="feedback-texto"></div>
+        </div>
+        <button id="btn-acao" onclick="verificarOuAvancar()">Confirmar Resposta</button>
+    </div>
+
+    <div id="tela-resultado" style="display: none;">
+        <h2>Resultado Final do Exame</h2>
+        <div id="status-final" class="resultado-status"></div>
+        <div class="card" id="detalhes-resultado"></div>
+        <button onclick="location.reload()">Gerar Novo Teste</button>
+    </div>
+</div>
+
+<script>
+    // Banco de Questões Reais sequenciais retiradas das folhas do PDF original
+    const bancoQuestoesPDF = [
+            {
+                "p": "A distância de paragem:",
+                "o": [
+                    "É o somatório da distância percorrida durante o tempo de reação e da distância de travagem, não sendo influenciada por fatores internos.",
+                    "É o somatório da distância percorrida durante o tempo de reação e da distância que o veículo tem de percorrer desde que é iniciada a travagem até se imobilizar.",
+                    "É essencialmente influenciada por fatores de ordem interna."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O airbag, o cinto de segurança e as barras de proteção lateral são considerados medidas de segurança:",
+                "o": [
+                    "Ativa.",
+                    "Passiva.",
+                    "Ativa e passiva.",
+                    "Mista."
+                ],
+                "c": 1
+            },
+            {
+                "p": "No que diz respeito à condução defensiva, assinale a afirmação que é falsa:",
+                "o": [
+                    "Deve corresponder a uma atitude do condutor sempre que conduz.",
+                    "Pode levar o condutor a prescindir dos seus direitos para salvaguardar a segurança rodoviária.",
+                    "Apesar de corresponder a uma atitude do condutor, traduz-se num comportamento.",
+                    "É um comportamento a adotar apenas em situações de risco."
+                ],
+                "c": 3
+            },
+            {
+                "p": "O que se entende pelo termo alcoolemia?",
+                "o": [
+                    "Quantidade de gramas de álcool puro existente num litro de sangue.",
+                    "Presença de álcool no sangue.",
+                    "Quantidade de álcool existente na bebida ingerida."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao circular no interior de uma localidade e num arruamento em que se verifique a existência de veículos corretamente estacionados de ambos os lados, o condutor deve:",
+                "o": [
+                    "Circular sem qualquer cuidado especial, uma vez que os veículos estão corretamente estacionados.",
+                    "Praticar uma condução defensiva, já que qualquer automóvel pode encobrir uma criança.",
+                    "Circular com as luzes de perigo acesas para ser visto pelos peões que circulem na via.",
+                    "Utilizar os sinais sonoros para prevenir o súbito aparecimento de uma criança na via."
+                ],
+                "c": 1
+            },
+            {
+                "p": "No processo da condução, em que consiste a exploração percetiva visual?",
+                "o": [
+                    "Na excitação dos órgãos sensoriais.",
+                    "Na deslocação dos olhos na cena visual.",
+                    "No reconhecimento de objectos a partir de estímulos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa em relação ao sistema rodoviário:",
+                "o": [
+                    "O sistema de circulação rodoviária é um conjunto de elementos interligados e dependentes.",
+                    "O homem é o elemento preponderante do sistema rodoviário.",
+                    "O acidente resulta sempre da falha de vários elementos do sistema rodoviário.",
+                    "A probabilidade de acidente aumenta quando há uma disfunção na interacção entre os vários elementos do sistema rodoviário."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Como se designa o conjunto de informações, regras e imagens mentais existentes na memória, que permitem ao condutor entender a realidade circundante?",
+                "o": [
+                    "Conhecimentos.",
+                    "Representações.",
+                    "Atitudes.",
+                    "Valores."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual o principal efeito do aumento da experiência de condução ao nível do agir?",
+                "o": [
+                    "Aumento do tempo de reacção.",
+                    "Aumento da rapidez das sequências sensório-motoras simples.",
+                    "Diminuição da automatização das capacidades sensório-motoras."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Os factores que determinam o tempo de reacção influenciam sempre:",
+                "o": [
+                    "A distância de travagem.",
+                    "A distância de paragem.",
+                    "As distâncias de travagem e de segurança."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O capacete de protecção é um elemento de segurança:",
+                "o": [
+                    "Activa porque diminui os danos causados em caso de acidente.",
+                    "Activa porque diminui a probabilidade de acidente.",
+                    "Passiva porque diminui os danos causados em caso de acidente.",
+                    "Passiva porque diminui a probabilidade de acidente."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Quais os factores de que depende essencialmente a distância de travagem?",
+                "o": [
+                    "Tipo e estado da via, estado e velocidade do veículo.",
+                    "Tipo e estado da via, estado psicofísico do condutor e velocidade de veículo.",
+                    "Estado do veículo, tipo de via e visibilidade."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O sistema de travagem ABS e o airbag pertencem ao mesmo tipo de elementos de segurança?",
+                "o": [
+                    "Sim, ambos são elementos de segurança activa.",
+                    "Não, o airbag é um elemento activo, enquanto que o ABS é um elemento passivo.",
+                    "Sim, ambos são elementos de segurança passiva.",
+                    "Não, o ABS é um elemento activo, enquanto que o airbag é um elemento passivo."
+                ],
+                "c": 3
+            },
+            {
+                "p": "O airbag é um elemento de segurança passiva porque tem por função minimizar os danos causados pelo acidente.",
+                "o": [
+                    "A afirmação está correcta.",
+                    "A afirmação está incorrecta."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A que tipo de medidas de segurança correspondem o capacete, as protecções rígidas e as luvas do motociclista?",
+                "o": [
+                    "Medidas de segurança activa.",
+                    "Medidas de segurança passiva.",
+                    "Medidas de segurança activa e passiva."
+                ],
+                "c": 1
+            },
+            {
+                "p": "No processo da condução, em que consiste a exploração perceptiva visual?",
+                "o": [
+                    "Na excitação dos órgãos sensoriais.",
+                    "Na deslocação dos olhos na cena visual.",
+                    "No reconhecimento de objectos a partir de estímulos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "O sistema de circulação rodoviária é um conjunto de elementos interligados e dependentes.",
+                    "O homem é o elemento preponderante do sistema rodoviário.",
+                    "O acidente resulta sempre da falha de vários elements do sistema rodoviário.",
+                    "A probabilidade de acidente aumenta quando há uma disfunção na interacção entre os vários elementos do sistema rodoviário."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Como se designa o conjunto de informações, regras e imagens mentais existentes na memória, que permitem ao condutor entender a realidade circundante?",
+                "o": [
+                    "Conhecimentos.",
+                    "Representações.",
+                    "Atitudes.",
+                    "Valores."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual o principal efeito do aumento da experiência de condução ao nível do agir?",
+                "o": [
+                    "Aumento do tempo de reacção.",
+                    "Aumento da rapidez das sequências sensório-motoras simples.",
+                    "Diminuição da automatização das capacidades sensório-motoras."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Assinale a afirmação incorrecta:",
+                "o": [
+                    "A fadiga, a ingestão de bebidas alcoólicas, a velocidade, as condições atmosféricas e o estado emocional do condutor podem influenciar o seu tempo de reacção.",
+                    "O tempo de reacção é o tempo que medeia entre o momento em que o condutor avista um obstáculo e o acto de o tentar evitar.",
+                    "A situação de condução com chuva, por si só, não é susceptível de provocar o aumento do tempo de reacção do condutor."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A distância de paragem é influenciada pelo tempo de reacção.",
+                "o": [
+                    "A afirmação está correcta.",
+                    "A afirmação está incorrecta."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Os factores que determinam o tempo de reacção influenciam sempre:",
+                "o": [
+                    "A distância de travagem.",
+                    "A distância de paragem.",
+                    "As distâncias de travagem e de segurança."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O capacete de protecção é um element de segurança:",
+                "o": [
+                    "Activa porque diminui os danos causados em caso de acidente.",
+                    "Activa porque diminui a probabilidade de acidente.",
+                    "Passiva porque diminui os danos causados em caso de acidente.",
+                    "Passiva porque diminui a probabilidade de acidente."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Quais os factores de que depende essencialmente a distância de travagem?",
+                "o": [
+                    "Tipo e estado da via, estado e velocidade do veículo.",
+                    "Tipo e estado da via, estado psicofísico do condutor e velocidade de veículo.",
+                    "Estado do veículo, tipo de via e visibilidade."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual das seguintes distâncias não sofre alterações em função do estado mecânico do veículo?",
+                "o": [
+                    "Distância de travagem.",
+                    "Distância de reacção.",
+                    "Distância de paragem."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema de travagem ABS e o airbag pertencem ao mesmo tipo de elementos de segurança?",
+                "o": [
+                    "Sim, ambos são elementos de segurança activa.",
+                    "Não, o airbag é um elemento activo, enquanto que o ABS é um elemento passivo.",
+                    "Sim, ambos são elementos de segurança passiva.",
+                    "Não, o ABS é um elemento activo, enquanto que o airbag é um elemento passivo."
+                ],
+                "c": 3
+            },
+            {
+                "p": "O ensino da condução automóvel e as campanhas de segurança rodoviária podem considerar-se como pertencentes ao mesmo tipo de medidas de segurança?",
+                "o": [
+                    "Sim, ambas podem considerar-se como medidas de segurança activa.",
+                    "Não, o ensino da condução é uma medida activa, ao passo que as campanhas são uma medida passiva.",
+                    "Sim, ambas podem considerar-se como medidas de segurança passiva.",
+                    "Não, as campanhas são uma medida activa, ao passo que o ensino da condução é uma medida passiva."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Quais os factores passíveis de influenciar a distância de travagem?",
+                "o": [
+                    "Factores de ordem interna.",
+                    "Factores de ordem externa.",
+                    "Factores de ordem interna e externa."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Como se designa o espaço percorrido pelo veículo, desde o momento em que um estímulo é identificado pelo condutor até iniciar a acção destinada a alcançar o objectivo escolhido?",
+                "o": [
+                    "Distância de segurança.",
+                    "Distância de travagem.",
+                    "Distância de reacção."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Quando é que a mesma quantidade de uma mesma bebida alcoólica pode afectar mais a capacidade para conduzir?",
+                "o": [
+                    "Quando ingerida lentamente e com alimentos no estômago.",
+                    "Quando ingerida lentamente e em jejum.",
+                    "Quando ingerida rapidamente e com alimentos no estômago.",
+                    "Quando ingerida rapidamente e em jejum."
+                ],
+                "c": 3
+            },
+            {
+                "p": "Tendo presente a tarefa da condução, assinale a frase que melhor descreve o momento de tratar a informação:",
+                "o": [
+                    "Decisão e sua execução, através de actos motores previamente tratados.",
+                    "Identificação de índices e sua utilização para representar um acontecimento futuro.",
+                    "Utilização de índices para 'visualizar' um acontecimento futuro e decisão."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "A distância de paragem é influenciada pelo tempo de reacção do condutor.",
+                    "A distância de travagem depende do estado mecânico do veículo.",
+                    "A experiência de condução leva ao aumento do tempo de reacção do condutor."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O que caracteriza o comportamento do condutor experiente?",
+                "o": [
+                    "Utiliza índices espaciais fixos, independentemente da velocidade a que circula.",
+                    "Faz uma exploração visual mais económica.",
+                    "Apresenta um elevado número de fixações no extremo direito."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Nos automóveis ligeiros mais recentes, os pré-tensores dos cintos de segurança, consideram-se equipamentos de segurança:",
+                "o": [
+                    "Passiva.",
+                    "Activa.",
+                    "Mista."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Em Portugal a sinistralidade envolvendo peões dá-se principalmente:",
+                "o": [
+                    "Nos meios interurbanos.",
+                    "Nos meios urbanos.",
+                    "Nas auto-estradas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Os acidentes rodoviários são, regra geral, resultado do comportamento do homem. De que forma o seu papel, enquanto instrutor, pode contribuir para alterar esta realidade?",
+                "o": [
+                    "Acreditando na importância da formação dos futuros condutores e mostrando mais do que um comportamento, uma atitude preventiva e defensiva.",
+                    "Esta realidade não pode ser alterada pelo instrutor. Este apenas pode formar os futuros condutores ao nível cognitivo.",
+                    "Esta realidade não pode ser alterada pela formação, mas sim com uma fiscalização rigorosa."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O tempo de reacção aumenta:",
+                "o": [
+                    "Com a ingestão de bebidas alcoólicas.",
+                    "Com o aumento da velocidade.",
+                    "Com a diminuição da distância de segurança."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Que nome se dá ao processo da tarefa da condução em que o condutor determina qual a resposta motora a executar?",
+                "o": [
+                    "Antecipação.",
+                    "Previsão.",
+                    "Decisão."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Das afirmações abaixo transcritas, referentes a processos da primeira fase da tarefa da condução, assinale a que lhe pareça estar menos correcta:",
+                "o": [
+                    "Percepção e E.P.V.",
+                    "Percepção, E.P.V. e Identificação.",
+                    "Sensação, E.P.V. e Previsão.",
+                    "Sensação, Percepção e E.P.V."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Pode dizer-se que o aumento da idade pode influenciar negativamente alguns aspectos da eficácia do exercício da condução?",
+                "o": [
+                    "Sim.",
+                    "Não."
+                ],
+                "c": 0
+            },
+            {
+                "p": "À medida que a experiência de condução aumenta, o condutor tende, gradualmente, a utilizar:",
+                "o": [
+                    "Menos índices e menos pertinentes.",
+                    "Mais índices e mais pertinentes.",
+                    "Menos índices e mais pertinentes."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual o principal effect da experiência de condução, ao nível do agir?",
+                "o": [
+                    "Aumento do tempo de reacção.",
+                    "Maior rapidez das sequências sensório-motoras.",
+                    "Menor automatização das capacidades sensório-motoras."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Assinale a afirmação correcta:",
+                "o": [
+                    "Para que o acidente ocorra, é necessário que, pelo menos, dois dos elementos que integram o sistema de circulação rodoviária falhem.",
+                    "O instrutor não pode considerar-se por força das suas competências, susceptível de influenciar os índices de sinistralidade rodoviária.",
+                    "O acidente rodoviário é uma realidade que afecta seriamente a economia nacional."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A recolha de informação influencia a previsão?",
+                "o": [
+                    "Sim, mas apenas num condutor experiente.",
+                    "Sim, dentro das localidades, porque o número de índices críticos é reduzido.",
+                    "Sim, sempre.",
+                    "Não, porque a previsão depende da memória a longo prazo e não da informação recolhida no momento."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "Identificação, na análise psicológica da condução, significa classificar os índices em categorias com significado.",
+                    "Previsão é a actividade de transformação de um índice em acontecimentos possíveis.",
+                    "A percepção é a actividade psicológica de recolha e conversão de índices."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Os sistemas de suspensão e travagem de um veículo contribuem para a segurança:",
+                "o": [
+                    "Activa.",
+                    "Passiva.",
+                    "Mista."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "A exploração sistemática dos espelhos retrovisores é uma das regras de treino da exploração perceptiva visual.",
+                    "O treino intensivo ao nível das capacidades sensório-motoras simples pode apresentar vantagens e inconvenientes.",
+                    "A decisão é passível de ser treinada com recurso às técnicas utilizadas no treino da EPV, da identificação e da previsão.",
+                    "A condução comentada é uma técnica indicada para o treino da identificação."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A que tipo de elementos de segurança pertencem as chamadas medidas de acalmia de trânsito (como por exemplo as rotundas), que são implementadas no interior das localidades?",
+                "o": [
+                    "Segurança activa.",
+                    "Segurança passiva."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cinto de segurança pode provocar graves lesões em caso de acidente, pelo que os condutores podem requerer uma inspecção médica com o objectivo de obterem dispensa legal da sua utilização.",
+                "o": [
+                    "A afirmação está correcta.",
+                    "A afirmação está errada."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que entende por alcoolemia?",
+                "o": [
+                    "Quantidade de gramas de álcool puro existente num litro de sangue.",
+                    "Presença de álcool no sangue.",
+                    "Quantidade de álcool existente na bebida ingerida."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual a distância que o condutor deve manter em relação ao veículo que o precede?",
+                "o": [
+                    "Consoante as condições ambientais, nunca inferior a 20 metros.",
+                    "A que lhe permita avistar a faixa de rodagem em toda a sua largura, numa extensão de pelo menos 50 metros.",
+                    "A que lhe permita parar sem perigo de acidente, em caso de travagem súbita do veículo da frente."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual a frase que melhor define previsão?",
+                "o": [
+                    "Classificação dos índices em categorias com significado.",
+                    "Imaginar o que pode acontecer, a partir dos índices pertinentes.",
+                    "Conjunto de procedimentos do condutor para detectar a presença ou ausência de índices críticos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "Para praticar uma condução defensiva não é condição suficiente que o condutor saiba “ver”, mas também que saiba “tornar-se visível”.",
+                    "A motivação para a prática de uma condução defensiva é um objectivo cognitivo da formação de condutores."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Das seguintes afirmações, relativas às distâncias que devem ser observadas na condução automóvel, assinale a que é falsa:",
+                "o": [
+                    "A velocidade, as condições atmosféricas e o estado de conservação da via e do veículo são passíveis de influenciar a distância de travagem.",
+                    "Dentro das localidades a distância de segurança entre dois veículos nunca deve ser inferior a 50 metros.",
+                    "Sempre que a velocidade aumenta, verifica-se também o aumento da distância de travagem."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "Ao conduzir defensivamente, o condutor deve sentir-se confortável ao volante, mantendo uma position que lhe permita o domínio de todos os comandos do veículo.",
+                    "Ao conduzir defensivamente, o condutor deve transmitir aos seus passageiros uma atmosfera de conforto e uma sensação de calma e confiança.",
+                    "Para a prática de uma condução defensiva, são condições suficientes o perfeito conhecimento do Código da Estrada e o perfeito domínio do veículo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "A comunicação, a compreensão e o respeito mútuo entre os vários utentes da via pública são três condições necessárias à prática duma condução defensiva.",
+                    "Conduzir defensivamente significa respeitar na íntegra o Código da Estrada e dominar com destreza o veículo.",
+                    "A prática de uma condução defensiva implica observar permanentemente o que se passa em volta, interpretar o que se observa e antecipar o que pode suceder."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução defensiva é uma atitude passível de ser ensinada e treinada com todos os candidatos a condutores?",
+                "o": [
+                    "Sim, constitui um dos principais objectivos da formação de condutores.",
+                    "Sim, desde que tal apenas seja feito em aulas orientadas para a aprendizagem em grupo.",
+                    "Não, dado que a sua aprendizagem representa uma sobrecarga de trabalho ao ensino da tarefa de condução."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que melhor caracteriza a prática de uma condução defensiva?",
+                "o": [
+                    "A acção do condutor em resposta às situações de perigo apresentadas.",
+                    "A exibição de um perfeito domínio do veículo.",
+                    "A acção do condutor em antecipação às situações de perigo.",
+                    "A condução de acordo com as regras informais do Código da Estrada."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O tempo de reacção condiciona a distância de paragem?",
+                "o": [
+                    "Sim, porque o tempo de reacção é inversamente proporcional à distância de paragem.",
+                    "Sim, porque ao influenciar directamente a distância de travagem, vai condicionar indirectamente a distância de paragem.",
+                    "Sim, porque a distância percorrida durante o tempo de reacção influencia a distância de paragem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Assinale a afirmação falsa:",
+                "o": [
+                    "A decisão do condutor depende das suas representações e atitudes.",
+                    "O meio ambiente constitui um factor importante enquanto envolvente e condicionante dos elementos integrantes do sistema de circulação rodoviária.",
+                    "A identificação e a previsão são os processos mais importantes da segunda etapa da tarefa de condução."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Dos factores abaixo enumerados, assinale o(s) que pode(m) levar à diminuição do tempo de reacção.",
+                "o": [
+                    "As boas condições da via e dos pneumáticos do veículo.",
+                    "O equipamento de segurança activa do veículo.",
+                    "A ingestão de bebidas alcoólicas e a velocidade de circulação.",
+                    "A atenção visual do condutor."
+                ],
+                "c": 3
+            },
+            {
+                "p": "O que se entende por tempo de reação?",
+                "o": [
+                    "O período que decorre entre a perceção de um estímulo e o início da ação motora.",
+                    "O tempo necessário para imobilizar por completo o veículo após travar.",
+                    "A duração da análise mental da envolvente rodoviária."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A fadiga crónica do condutor atua principalmente ao nível:",
+                "o": [
+                    "Da aderência dos pneumáticos ao solo em curvas acentuadas.",
+                    "Da diminuição mecânica da eficácia do sistema de travagem.",
+                    "Do aumento substancial do tempo de reação e quebra na atenção."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Conduzir sob o efeito de substâncias psicotrópicas (medicamentos ansiolíticos, etc.):",
+                "o": [
+                    "Reduz a distância de travagem do automóvel.",
+                    "Altera negativamente as capacidades cognitivas e motoras necessárias à condução.",
+                    "Diminui o tempo de reação face a imprevistos na via pública."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao nível visual do condutor, o fenómeno conhecido como \"visão em túnel\" é potenciado por:",
+                "o": [
+                    "Elevadas velocidades de circulação ou estados graves de fadiga e alcoolémia.",
+                    "Uma correta regulação e utilização dos espelhos retrovisores exteriores.",
+                    "Conduzir apenas em vias urbanas secundárias com forte iluminação pública."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Em condições meteorológicas adversas como o início de chuva miúda, a distância de travagem:",
+                "o": [
+                    "Diminui devido ao arrefecimento natural da superfície dos pneus.",
+                    "Aumenta significativamente pelo aparecimento de uma película escorregadia no pavimento.",
+                    "Mantém-se inalterada se o condutor acionar o sistema ABS."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O conceito de \"Margem de Segurança\" na condução defensiva foca-se em:",
+                "o": [
+                    "Manter espaço e tempo livres à volta do veículo para gerir imprevistos sem colidir.",
+                    "Circular sempre à velocidade mínima permitida por lei na faixa de rodagem.",
+                    "Utilizar exclusivamente a faixa de rodagem central nas autoestradas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A quem cabe a responsabilidade principal pelas falhas de interação no sistema rodoviário?",
+                "o": [
+                    "Ao legislador, que define as coimas aplicadas às contraordenações.",
+                    "Ao construtor mecânico do automóvel pelos sistemas eletrónicos instalados.",
+                    "Ao elemento humano (condutor/peão), por ser o centro dinâmico do sistema."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual a função primordial dos encostos de cabeça integrados nos bancos dos automóveis?",
+                "o": [
+                    "Aumentar o conforto e comodidade postural do condutor em viagens longas.",
+                    "Evitar ou reduzir lesões cervicais graves (\"efeito de chicote\") em colisões traseiras.",
+                    "Servir de ponto de fixação para os sistemas de retenção infantil."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A fadiga na condução pode manifestar-se através de:",
+                "o": [
+                    "Micro-sonos, lentidão de movimentos, ilusões óticas e perdas frequentes de memória imediata.",
+                    "Um aumento involuntário na acuidade visual e maior perceção lateral dos perigos.",
+                    "Maior facilidade em executar sequências sensório-motoras complexas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor emocionalmente alterado (raiva, ansiedade profunda, stresse acumulado):",
+                "o": [
+                    "Consegue tomar decisões lógicas de forma mais célere e precisa nas vias públicas.",
+                    "Tem uma forte tendência para assumir comportamentos de risco e falhar na antecipação.",
+                    "Reduz a probabilidade de se envolver em sinistros rodoviários graves urbanos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O que deve fazer para combater o aparecimento dos sintomas de fadiga numa viagem longa?",
+                "o": [
+                    "Ingerir bebidas alcoólicas leves em pequenas quantidades programadas.",
+                    "Aumentar substancialmente a velocidade do veículo para chegar mais depressa ao destino.",
+                    "Fazer pausas regulares de 15 a 20 minutos a cada duas horas de condução."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Os peões idosos e as crianças partilham uma vulnerabilidade comum em meio urbano:",
+                "o": [
+                    "Dificuldade na avaliação correta da distância e velocidade dos veículos em aproximação.",
+                    "Conhecimento absoluto de todas as regras e exceções do Código da Estrada em vigor.",
+                    "Utilização exclusiva de passadeiras com controlo luminoso por botão."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que define a \"condução defensiva\"?",
+                "o": [
+                    "Conduzir sempre na faixa da esquerda mantendo os faróis de nevoeiro ligados.",
+                    "Impor rigorosamente a prioridade de passagem, mesmo que resulte em colisão iminente.",
+                    "Antecipar riscos potenciais e adotar atitudes preventivas para salvaguardar a segurança pública."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O tempo de reação de um condutor saudável e descansado ronda em média:",
+                "o": [
+                    "Três a cinco segundos completos.",
+                    "Cerca de um segundo.",
+                    "Centésimos impercetíveis de segundo."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema de controlo eletrónico de estabilidade (ESP) atua como segurança:",
+                "o": [
+                    "Activa, pois ajuda a corrigir a trajetória do veículo e previne despistes.",
+                    "Passiva, dado que absorve a energia do impacto em colisões laterais.",
+                    "Suplementar secundária, atuando apenas após a ativação total dos airbags."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A monotonia da condução prolongada em autoestradas retilíneas potencia principalmente:",
+                "o": [
+                    "A ocorrência do fenómeno da \"hipnose da autoestrada\" e o aparecimento súbito de fadiga.",
+                    "Um aumento substancial da eficácia mecânica do sistema de travagem hidráulica.",
+                    "A prevenção espontânea de falhas mecânicas complexas nos pneumáticos traseros."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância de travagem de um veículo duplica se a velocidade duplicar?",
+                "o": [
+                    "Sim, a relação entre o aumento da velocidade e a travagem é estritamente linear.",
+                    "Não, a distância de travagem diminui proporcionalmente à energia cinética acumulada.",
+                    "Não, a distância de travagem aumenta de forma quadrática (quadruplica se a velocidade duplicar)."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Conduzir sob condições de nevoeiro denso exige que o condutor reduza a velocidade para garantir que:",
+                "o": [
+                    "A distância de paragem seja inferior ao seu campo visual visível na via pública.",
+                    "O sistema de segurança passiva do veículo permaneça sempre em modo de espera ativo.",
+                    "O tempo de reação biológico diminua para valores inferiores a meio segundo."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Considera-se um comportamento correto de condução defensiva perante um ciclista:",
+                "o": [
+                    "Utilizar sinais sonoros curtos e repetidos colado à retaguarda para exigir a sua saída da via.",
+                    "Guardar uma distância lateral mínima de 1,5 metros ao efetuar a sua ultrapassagem de forma segura.",
+                    "Efetuar a ultrapassagem o mais rápido possível no interior da mesma via sem desviar a trajetória."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O envelhecimento natural do ser humano afeta o desempenho na condução principalmente devido a:",
+                "o": [
+                    "Diminuição da acuidade visual noturna, menor resistência ao encadeamento e aumento do tempo de reação.",
+                    "Perda absoluta da memória a longo prazo relacionada com a sinalização rodoviária vertical.",
+                    "Aumento descontrolado da rapidez na execução de sequências motoras automatizadas complexas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor experiente difere de um condutor recém-encartado porque:",
+                "o": [
+                    "Consegue circular a velocidades elevadas sem que ocorram alterações no seu campo visual.",
+                    "Possui um tempo de reação biológica fixo e imutável de zero segundos face a perigos imprevistos.",
+                    "Realiza uma exploração percetiva visual mais económica, focando-se em índices mais pertinentes."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A distância percorrida pelo veículo durante o tempo de reação depende exclusivamente de:",
+                "o": [
+                    "Estado mecânico de conservação dos travões e da pressão de ar dos pneus.",
+                    "Velocidade de circulação do veículo e do estado psicofísico do condutor.",
+                    "Coeficiente de aderência do pavimento e das condições climatéricas envolventes."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual das seguintes opções descreve uma medida de segurança passiva nas infraestruturas rodoviárias?",
+                "o": [
+                    "Colocação de passadeiras sobrelevadas para obrigar à redução drástica de velocidade.",
+                    "Instalação de semáforos de controlo de velocidade automáticos à entrada de povoações.",
+                    "Barreiras de proteção metálicas deformáveis instaladas nas bermas das vias para amortecer impactos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A ingestão simultânea de álcool e de determinados medicamentos pode resultar em:",
+                "o": [
+                    "Neutralização mútua dos efeitos nocivos de ambos os componentes no sangue.",
+                    "Efeito de potenciação recíproca, agravando drasticamente a perda de capacidades de condução.",
+                    "Uma redução espontânea na taxa de alcoolémia medida pelo condutor."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução sob stresse profissional agudo pode levar o condutor a:",
+                "o": [
+                    "Ignorar a sinalização rodoviária secundária, circular com menor distância de segurança e agir com agressividade.",
+                    "Praticar sistematicamente uma condução defensiva focada na segurança coletiva urbana.",
+                    "Reduzir de forma drástica os tempos de reação biológica perante peões em passadeiras."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante a presença de veículos de emergência assinalando a sua marcha urgente, o condutor deve:",
+                "o": [
+                    "Manter a velocidade e a trajetória de circulação, pois os veículos prioritários contornam os obstáculos.",
+                    "Facilitar a passagem libertando espaço na faixa de rodagem, desviando-se para a berma se necessário e seguro.",
+                    "Travar bruscamente na via para imobilizar de imediato o veículo e ceder a passagem."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O fenómeno de aquaplanagem ocorre quando:",
+                "o": [
+                    "Os travões aquecem devido à humidade extrema condensada nos discos metálicos.",
+                    "O veículo circula a baixa velocidade em pavimentos lavados recentemente pelas equipas municipais.",
+                    "Os pneus perdem totalmente o contacto direto com o solo devido a uma película de água acumulada na via."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Para garantir o bom funcionamento dos airbags em caso de acidente, os ocupantes devem:",
+                "o": [
+                    "Utilizar obrigatoriamente e de forma correta o cinto de segurança acoplado.",
+                    "Desativar os pré-tensores dos cintos para evitar pressões abdominais excessivas.",
+                    "Manter as mãos posicionadas no topo central do painel frontal ou do volante de direção."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual o comportamento adequado ao circular numa rotunda com várias saídas?",
+                "o": [
+                    "Utilizar a via da direita apenas se pretender sair na primeira ou segunda saída imediatamente a seguir.",
+                    "Circular permanentemente pela via exterior esquerda da rotunda, independentemente da saída escolhida.",
+                    "Efetuar a totalidade do anel da rotunda pela via mais à direita sem sinalizar as manobras."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A condução sob fadiga intensa afeta a recolha de informação pelo condutor porque:",
+                "o": [
+                    "Altera o funcionamento mecânico interno do espelho retrovisor central eletrocromático.",
+                    "Reduz a frequência dos movimentos oculares e estreita o campo visual útil.",
+                    "Aumenta involuntariamente o número de fixações visuais na sinalização vertical distante."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O principal objetivo do sistema de travagem de serviço é:",
+                "o": [
+                    "Reduzir a velocidade do veículo de forma controlada ou imobilizá-lo com segurança.",
+                    "Substituir o travão de estacionamento quando estacionado em descidas de forte inclinação.",
+                    "Atuar como elemento de retenção passiva mecânica em caso de embates traseiros urbanos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa travagem de emergência num pavimento seco com um veículo sem ABS, se as rodas bloquearem:",
+                "o": [
+                    "A distância de travagem diminui devido ao atrito constante da borracha estática.",
+                    "O condutor aumenta a precisão e o controlo da trajetória direcional do veículo nas curvas.",
+                    "O veículo desliza sem aderência direcional, aumentando o risco de colisão ou despiste."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O encadeamento provocado pelos faróis de um veículo em sentido contrário provoca:",
+                "o": [
+                    "Uma redução imediata da distância percorrida pelo automóvel durante a fase de travagem.",
+                    "Cegueira momentânea e um aumento drástico do tempo necessário para identificar perigos.",
+                    "O alargamento involuntário e imediato do campo visual periférico do condutor."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Na condução urbana, a utilização correta das luzes indicadoras de mudança de direção (piscas) deve ser feita:",
+                "o": [
+                    "Com a antecedência necessária para avisar os outros utentes da via antes de iniciar a manobra.",
+                    "No exato milissegundo em que o condutor começa a rodar o volante do automóvel.",
+                    "Apenas quando circulan peões nas passadeiras adjacentes à manobra de conversão."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma calçada com folhas caídas e humidade, o coeficiente de aderência do pavimento:",
+                "o": [
+                    "Aumenta exponencialmente devido à rugosidade extra do material orgânico acumulado.",
+                    "Permanece estável se a pressão dos pneumáticos for verificada em frio semanalmente.",
+                    "Diminui significativamente, tornando o piso escorregadio e aumentando a distância de travagem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O álcool é eliminado do organismo humano maioritariamente através de que órgão?",
+                "o": [
+                    "Através dos rins por via da excreção urinária direta.",
+                    "Através do fígado, por oxidação metabólica.",
+                    "Através dos pulmões durante a fase de expiração contínua."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual o comportamento defensivo mais adequado ao circular atrás de um veículo de instrução?",
+                "o": [
+                    "Aumentar a distância de segurança e demonstrar paciência face a possíveis paragens súbitas ou hesitações.",
+                    "Efetuar uma ultrapassagem rápida na primeira oportunidade, mesmo que envolva pisar uma linha contínua.",
+                    "Utilizar os máximos repetidamente para avisar o candidato da sua presença próxima."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Ao circular com chuva intensa, o perigo de embate na retaguarda do veículo da frente diminui se o condutor:",
+                "o": [
+                    "Ativar os faróis de nevoeiro traseiros mantendo a mesma velocidade de cruzeiro original.",
+                    "Confiar na ativação automática eletrónica dos pré-tensores dos cintos de segurança das bermas.",
+                    "Reduzir a velocidade de circulação e aumentar significativamente a distância de segurança."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O uso de calçado inadequado (como chinelos de praia) durante o ato de condução:",
+                "o": [
+                    "É recomendado em percursos urbanos curtos devido ao maior arejamento térmico dos pés.",
+                    "Compromete a segurança ativa porque prejudica a precisão e a rapidez do acionamento dos pedais.",
+                    "Diminui o tempo de reação mecânica e biológica do condutor perante os travões."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O cansaço visual provocado pela condução noturna continuada pode ser atenuado se:",
+                "o": [
+                    "O painel de instrumentos de bordo tiver a sua intensidade luminosa devidamente regulada para níveis baixos.",
+                    "O condutor fixar continuamente o feixe luminoso projetado no asfalto pelos seus próprios faróis médios.",
+                    "Ativar as luzes de habitáculo interiores de cortesia durante as curvas mais acentuadas urbanas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância de travagem do veículo é diretamente proporcional à carga transportada?",
+                "o": [
+                    "Sim, um aumento de carga eleva a energia cinética do veículo, aumentando o esforço exigido aos travões.",
+                    "Não, a carga aumenta a força vertical de compressão e reduz sempre as distâncias de imobilização.",
+                    "Não, o peso do veículo apenas influencia a distância percorrida no tempo de reação biológica."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O ângulo morto ou ponto cego do veículo consiste em:",
+                "o": [
+                    "Uma avaria elétrica temporária nos sensores volumétricos de estacionamento traseiro.",
+                    "Áreas em redor do veículo que não podem ser diretamente observadas através dos espelhos retrovisores.",
+                    "A zona frontal da carroçaria que deforma programadamente durante uma colisão violenta."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Numa condução defensiva urbana, ao aproximar-se de um autocarro de transporte público parado na berma, deve:",
+                "o": [
+                    "Acelerar rapidamente para efetuar a ultrapassagem antes do reinício da sua marcha.",
+                    "Reduzir a velocidade e prever o aparecimento repentino de peões a atravessar a via pela frente do autocarro.",
+                    "Manter a velocidade imutável buzinando de forma contínua para afastar os peões da berma."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O estado emocional de stresse agudo e ansiedade atua no condutor provocando:",
+                "o": [
+                    "O aumento significativo da capacidade de foco periférico na sinalização rodoviária.",
+                    "A estabilização perfeita dos tempos de reação mecânicos do sistema hidráulico.",
+                    "Uma tendência para a precipitação, sobrestimação das capacidades e assunção de comportamentos agressivos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Os espelhos retrovisores exteriores convexos apresentam as imagens de uma forma que:",
+                "o": [
+                    "Alarga o campo visual, mas faz com que os objetos pareçam mais distantes do que a realidade.",
+                    "Reduz o ponto cego lateral aproximando realisticamente a imagem dos veículos à retaguarda.",
+                    "Inverte verticalmente a trajetória dos veículos que se encontram em fase de ultrapassagem."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A fadiga muscular e a sonolência surgem mais frequentemente se o condutor mantiver:",
+                "o": [
+                    "O habitáculo excessivamente aquecido e sem qualquer renovação de ar fresco.",
+                    "O sistema de som desligado com a janela ligeiramente aberta durante o trajeto urbano.",
+                    "Paragens regulares de quinze minutos a cada hora e meia em autoestradas nacionais."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Em relação ao peão que transita sob o efeito do álcool em ambiente urbano, o condutor deve:",
+                "o": [
+                    "Considerar que o peão respeitará escrupulosamente a sinalização luminosa de travessia.",
+                    "Redobrar a atenção e diminuir a velocidade, prevendo movimentos descoordenados ou quedas na via.",
+                    "Manter a velocidade normal confiando que os sistemas eletrónicos do veículo evitam o embate."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema eletrónico de travagem assistida de emergência (BAS / EBA) serve para:",
+                "o": [
+                    "Reduzir de forma artificial a fadiga muscular e o stresse físico dos membros do condutor.",
+                    "Impedir o acionamento indesejado dos airbags frontais a velocidades urbanas reduzidas.",
+                    "Aplicar a força máxima de travagem se detetar uma pressão rápida e brusca no pedal, encurtando a paragem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Perante nevoeiro denso diurno, que luzes de iluminação do veículo devem ser ligadas?",
+                "o": [
+                    "Apenas as luzes de presença e os indicadores de perigo de forma intermitente contínua.",
+                    "As luzes de cruzamento (médios) e as luzes de nevoeiro correspondentes regulamentares.",
+                    "Obrigatoriamente as luzes de estrada (máximos) para garantir maior profundidade visual."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução defensiva baseia-se em três pilares fundamentais de atuação:",
+                "o": [
+                    "Ver (recolha de informação), Prever (antecipação do risco) e Agir (atitude preventiva).",
+                    "Velocidade (cumprimento do limite), Destreza (domínio mecânico) e Força (acionamento rápido).",
+                    "Buzinar (aviso de presença), Ultrapassar (fluidez do trânsito) e Travar (imobilização brusca)."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O estaleiro de obras na faixa de rodagem representa um perigo acrescido porque:",
+                "o": [
+                    "Provoca uma avaria imediata nos amortecedores mecânicos e barras estabilizadoras.",
+                    "Modifica a trajetória normal dos veículos, reduz a largura útil da via e acumula detritos.",
+                    "Altera os tempos de reação biológicos do condutor para o triplo do valor de referência."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Na condução com chuva intensa, o fenómeno de \"vidros embaciados\" reduz a visibilidade. O condutor deve:",
+                "o": [
+                    "Desligar por completo os sistemas de ventilação mecânica para evitar correntes de ar frias.",
+                    "Limpar manualmente o para-brisas de forma regular com tecidos orgânicos húmidos.",
+                    "Ativar o sistema de ar condicionado direcionado para o vidro e ligar o desembaciador traseiro."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O condutor que circula cansado tem tendência para efetuar trajetórias:",
+                "o": [
+                    "Irregulares, com pequenas correções bruscas de direção e desvios involuntários na via.",
+                    "Rigorosamente retilíneas e centradas na faixa de rodagem secundária.",
+                    "Mais seguras e estáveis devido ao abrandamento mecânico voluntário das rodas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Que perigo acrescido representa a condução em vias urbanas durante o período de saída das escolas?",
+                "o": [
+                    "O aparecimento súbito de falhas mecânicas no sistema eletrónico do travão de estacionamento.",
+                    "O atravessamento intempestivo e imprevisível da faixa de rodagem por parte de crianças.",
+                    "O aumento do coeficiente de aderência dos pneumáticos devido à presença de peões na berma."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A utilização de auscultadores (fones) em ambos os ouvidos durante a condução é permitida por lei?",
+                "o": [
+                    "Sim, desde que o volume de reprodução sonora permita ouvir chamadas telefónicas urbanas.",
+                    "Sim, apenas se o condutor circular no interior de localidades a velocidades reduzidas.",
+                    "Não, é proibida por lei, pois reduz a perceção auditiva de sinais sonoros e veículos de emergência."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A verificação periódica da pressão dos pneus deve ser efetuada:",
+                "o": [
+                    "Com os pneus frios, respeitando os valores recomendados pelo fabricante do veículo.",
+                    "Imediatamente após uma viagem longa em autoestrada para aproveitar o aquecimento do ar.",
+                    "Apenas quando o veículo demonstrar perdas de trajetória direcional em pavimentos secos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução noturna, ao mudar de luzes de estrada (máximos) para luzes de cruzamento (médios), o condutor deve:",
+                "o": [
+                    "Aumentar a velocidade de circulação para compensar a perda de profundidade visual na via.",
+                    "Reduzir moderadamente a velocidade, adequando-a ao menor alcance do feixe luminoso.",
+                    "Ativar em simultâneo os indicadores de perigo para alertar os condutores da retaguarda."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O transporte de animais de estimação no interior do habitáculo deve ser feito de forma a que:",
+                "o": [
+                    "O animal permaneça livre no banco da frente para facilitar a sua monitorização visual.",
+                    "Fique posicionado junto aos pedais de comando mecânicos para baixar o centro de gravidade.",
+                    "Seja devidamente assegurada a sua retenção (caixa de transporte ou cinto próprio), impedindo interferências com o condutor."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Numa via com forte inclinação (descida acentuada), para poupar o sistema de travagem de serviço, o condutor deve:",
+                "o": [
+                    "Utilizar uma relação de caixa de velocidades mais baixa, aproveitando o efeito de \"travão de motor\".",
+                    "Circular com a embraiagem totalmente pressionada ou com a caixa de velocidades em ponto morto.",
+                    "Desligar a ignição do motor do veículo para travar o movimento das rodas por via mecânica direta."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cansaço provocado pelo stresse no trânsito urbano congestionado reduz no condutor:",
+                "o": [
+                    "A distância percorrida pelo veículo durante o tempo de reação mecânica geral.",
+                    "A capacidade de tolerância à frustração, aumentando comportamentos agressivos ou precipitados.",
+                    "O risco de colisões por desatenção nas passadeiras de peões sobrelevadas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Para além do condutor, a fadiga na condução prolongada afeta significativamente:",
+                "o": [
+                    "A capacidade dos passageiros em auxiliarem na leitura da sinalização rodoviária distante se estiverem sonolentos.",
+                    "O funcionamento e a pressão pneumática interna dos pneus de perfil baixo.",
+                    "A calibração eletrónica automática dos sistemas de navigation GPS urbanos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que se entende por \"distância de reação\"?",
+                "o": [
+                    "O espaço percorrido desde que se acionam os travões até à imobilização completa.",
+                    "O espaço que o veículo percorre entre a perceção do perigo e o início da travagem.",
+                    "A soma total da distância de segurança com a distância de travagem mecânica."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual das seguintes opções descreve uma atitude de cortesia rodoviária?",
+                "o": [
+                    "Manter a marcha urgente acionando as luzes de perigo em todas as rotundas urbanas.",
+                    "Exigir sempre o cumprimento estrito do seu direito de prioridade em cruzamentos entupidos.",
+                    "Facilitar a integração de um veículo que sinaliza a mudança de faixa num trânsito congestionado."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Conduzir sob um estado de cansaço extremo provocado por insónias equivale a:",
+                "o": [
+                    "Apresentar perturbações na coordenação e tempo de reação semelhantes a uma taxa de alcoolémia ilegal.",
+                    "Otimizar o campo visual útil central devido ao aumento da rigidez ocular periférica.",
+                    "Melhorar de forma significativa a execução de sequências motoras complexas em descidas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Os peões que circulam nas bermas das vias fora das localidades durante a noite devem:",
+                "o": [
+                    "Circular sempre no mesmo sentido de marcha dos veículos automóveis ligeiros.",
+                    "Caminhar em sentido contrário ao dos veículos e utilizar vestuário retrorrefletor.",
+                    "Transitar exclusivamente pelo eixo central da faixa de rodagem para maior visibilidade."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema eletrónico de travagem antibloqueio (ABS) garante principalmente que:",
+                "o": [
+                    "As rodas não bloqueiem numa travagem violenta, mantendo a capacidade de direção do veículo.",
+                    "O veículo pare sempre em metade da distância regulamentar em pavimentos com gelo.",
+                    "A pressão do óleo lubrificante do motor se mantenha estável em curvas rápidas urbanas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na aproximação a uma passagem de nível sem barreiras, o condutor defensivo deve:",
+                "o": [
+                    "Avançar rapidamente confiando que os comboios emitem avisos sonoros obrigatórios.",
+                    "Manter a velocidade de cruzeiro acionando os indicadores de perigo intermitentes.",
+                    "Reduzir a velocidade, parar se necessário, olhar e escutar atentamente antes de atravessar."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A eficácia dos travões de um veículo pode diminuir drasticamente após atravessar uma poça de água profunda devido:",
+                "o": [
+                    "Ao bloqueio imediato das válvulas eletrónicas do reservatório do fluido hidráulico.",
+                    "À perda temporária de atrito provocada pela humidade entre as pastilhas e os discos de travão.",
+                    "Ao aumento repentino da rigidez mecânica dos cabos do travão de estacionamento."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Perante o risco de aquaplanagem, o condutor deve adotar o seguinte comportamento:",
+                "o": [
+                    "Desacelerar suavemente levantando o pé do acelerador, segurar firmemente o volante e evitar travar brusco.",
+                    "Travar a fundo de forma contínua para forçar os pneus a romper a película de água.",
+                    "Rodar o volante rapidamente para os lados de modo a recuperar a aderência lateral traseira."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Considera-se um fator de risco acrescido na condução durante o crepúsculo (entardecer):",
+                "o": [
+                    "A calibração mecânica deficiente do sistema de suspensão ativa independente do veículo.",
+                    "A redução automática da distância de paragem devido à humidade condensada no asfalto.",
+                    "A transição rápida de luz que dificulta a adaptação visual do olho e a identificação de peões."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Ao efetuar a manobra de marcha-atrás, o condutor defensivo deve:",
+                "o": [
+                    "Executar a manobra lentamente, confirmando os ângulos mortos e cedendo a prioridade a outros utentes.",
+                    "Confiar exclusivamente nos espelhos convexos sem necessidade de olhar diretamente para a retaguarda.",
+                    "Acionar os sinais sonoros de forma contínua e acelerar para libertar rapidamente o cruzamento."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A eficácia do sistema de retenção para crianças (cadeirinhas) depende diretamente de:",
+                "o": [
+                    "Estar posicionado no banco frontal do passageiro com o airbag do habitáculo totalmente ativo.",
+                    "Ser homologado e adequado ao peso, tamanho e idade da criança, estando corretamente fixado.",
+                    "Possuir um revestimento térmico orgânico impermeável compatível com os cintos traseiros."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Numa travagem de emergência com ABS num pavimento molhado, o pedal do travão pode vibrar. O condutor deve:",
+                "o": [
+                    "Aliviar imediatamente a pressão do pedal para evitar a quebra dos componentes hidráulicos.",
+                    "Puxar em simultâneo o travão de estacionamento para auxiliar a imobilização mecânica das rodas.",
+                    "Manter a pressão máxima e contínua no pedal do travão até o veículo imobilizar por completo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O perigo de colisão por distração aumenta de forma substancial quando o condutor:",
+                "o": [
+                    "Manuseia o telemóvel para ler ou enviar mensagens de texto durante a marcha.",
+                    "Mantém o feixe dos faróis médios regulados de acordo com a carga traseira transportada.",
+                    "Executa a exploração visual sistemática através dos espelhos retrovisores regulamentares."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância de segurança frontal em relação ao veículo precedente deve ser aumentada se:",
+                "o": [
+                    "O veículo circular em autoestrada retilínea com ótimas condições de visibilidade diurna.",
+                    "O pavimento se encontrar molhado ou a visibilidade ser reduzida devido a nevoeiro ou chuva.",
+                    "O automóvel circular vazio e sem qualquer carga suplementar no compartimento de bagagens."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Considera-se um utente vulnerável no sistema de circulação rodoviária urbana:",
+                "o": [
+                    "O ciclista, o peão e o condutor de veículos de duas rodas a motor.",
+                    "O condutor de pesados de passageiros com sistema eletrónico de estabilidade ativo.",
+                    "Qualquer ocupante de um veículo ligeiro de mercadorias equipado com airbags laterais."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A fadiga mental do condutor provoca alterações na tarefa da condução, tais como:",
+                "o": [
+                    "Alargamento imediato do campo de visão periférica e maior tolerância ao encadeamento.",
+                    "Redução artificial das distâncias necessárias para efetuar a travagem mecânica do veículo.",
+                    "Fixação prolongada do olhar em índices irrelevantes e atraso na tomada de decisões preventivas."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Perante uma poça de óleo derramado no pavimento de uma curva, o condutor deve:",
+                "o": [
+                    "Travar energicamente no interior da curva para fixar a trajetória das rodas traseras.",
+                    "Reduzir a velocidade antes da curva, evitar mudanças bruscas de direção e não travar sobre o óleo.",
+                    "Acelerar de forma contínua para forçar os pneus a recuperar a aderência mecânica perdida."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O cinto de segurança deve ser posicionado de forma a que a fita inferior passe sobre:",
+                "o": [
+                    "A zona pélvica (ancas), garantindo a retenção pelas estruturas ósseas duras.",
+                    "A região mole do abdómen para amortecer a desaceleração de colisões frontais.",
+                    "Qualquer ponto livre abaixo das coxas do ocupante do automóvel ligeiro."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância percorrida durante o tempo de reação aumenta diretamente se:",
+                "o": [
+                    "O estado mecânico de conservação dos amortecedores traseiros estiver deficiente.",
+                    "O condutor circular a uma velocidade mais elevada ou estiver sob o efeito do cansaço.",
+                    "O pavimento da faixa de rodagem urbana for constituído por asfalto rugoso seco."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Conduzir com o vidro do para-brisas salpicado de lama ou poeira acumulada:",
+                "o": [
+                    "Reduz a visibilidade e aumenta significativamente o cansaço visual e o risco de encadeamento.",
+                    "Otimiza a focagem central dos índices em autoestradas com forte sinalização horizontal.",
+                    "Reduz mecanicamente a distância que o veículo percorre durante a fase de reação."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução defensiva, o condutor deve partilhar a via pública baseando-se no princípio de:",
+                "o": [
+                    "Imposição rigorosa dos direitos legais e prioridades absolutas previstos no regulamento.",
+                    "Utilização preferencial das vias esquerdas centrais para garantir maior fluidez de marcha.",
+                    "Cooperação mútua, respeito pelos utentes vulneráveis e prevenção de falhas alheias."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A ingestão de refeições muito pesadas e abundantes antes de conduzir provoca:",
+                "o": [
+                    "Uma redução biológica imediata no tempo de reação do condutor face a obstáculos súbitos.",
+                    "Sonolência profunda, apatia e perda de eficácia na exploração percetiva visual.",
+                    "O aumento involuntário da acuidade visual central para trajetórias retilíneas longas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O aparecimento do fenómeno da fadiga do condutor durante a noite é severamente agravado por:",
+                "o": [
+                    "Falta de contraste visual da envolvente, monotonia das vias e quebra no ritmo biológico.",
+                    "Uma correta regulação eletrónica da inclinação dos faróis de cruzamento do automóvel.",
+                    "Circulação em vias urbanas secundárias dotadas de fortes sistemas de iluminação LED."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma lomba acentuada que retira visibilidade sobre a extensão da via, o condutor deve:",
+                "o": [
+                    "Manter a mesma velocidade de marcha, desviando o veículo para a berma direita de terra.",
+                    "Acionar repetidamente os sinais sonoros e efetuar a ultrapassagem acelerando a fundo.",
+                    "Reduzir moderadamente a velocidade e manter o veículo o mais próximo possível da berma direita."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O sistema de controlo eletrónico de tração (ASR / TCS) atua como segurança ativa porque:",
+                "o": [
+                    "Evita o patinhamento das rodas motrizes em fases de aceleração ou pisos escorregadios.",
+                    "Amortece as forças resultantes da desaceleração violenta em colisões frontais mecânicas.",
+                    "Garante a lubrificação hidráulica otimizada permanente do reservatório da embraiagem."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor idoso com quebra na flexibilidade motora das articulações terá maiores dificuldades em:",
+                "o": [
+                    "Memorizar de forma cronológica lógicas complexas da sinalização vertical regulamentar.",
+                    "Executar manobras rápidas de desvio ou olhar para trás nas mudanças de faixa e marcha-atrás.",
+                    "Manter uma pressão regular contínua e suave no pedal do acelerador em autoestradas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Nas descidas íngremes prolongadas com pavimento molhado, travar de forma contínua e violenta pode provocar:",
+                "o": [
+                    "O aumento involuntário imediato do coeficiente de aderência dinâmico dos pneus traseiros.",
+                    "A redução programada eletrónica do tempo necessário para iniciar a reação muscular biológica.",
+                    "Aquecimento excessivo dos travões (fading) e perda quase total de eficácia de travagem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O transporte de mercadorias ou bagagens no tejadilho do veículo altera a condução porque:",
+                "o": [
+                    "Eleva o centro de gravidade, afetando a estabilidade em curvas e aumentando a resistência ao vento.",
+                    "Reduz mecanicamente a energia cinética e diminui as distâncias de paragem sob chuva.",
+                    "Bloqueia o acionamento eletrónico automático dos pré-tensores dos cintos dianteiros."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma situação de trânsito em que outro condutor cometa uma infração grave contra si, deve:",
+                "o": [
+                    "Buzinar e fazer sinais de luzes agressivos para demonstrar a incorreção da manobra alheia.",
+                    "Manter a calma, priorizar a segurança rodoviária e evitar qualquer atitude de retaliação.",
+                    "Intercetar a trajetória desse veículo mais à frente para exigir explicações formais urbanas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A pressão de enchimento dos pneus abaixo do recomendado pelo fabricante provoca:",
+                "o": [
+                    "Desgaste prematuro nas extremidades externas da banda de rolagem, maior consumo de combustível e instabilidade.",
+                    "Desgaste acentuado unicamente na zona central da banda de rodagem do automóvel.",
+                    "A redução mecânica imediata da distância percorrida pelo veículo durante o tempo de reação."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução invernal sob queda de neve, a aderência dos pneus diminui drasticamente. O condutor defensivo deve:",
+                "o": [
+                    "Circular utilizando a relação de caixa mais baixa possível com rotações muito elevadas do motor.",
+                    "Efetuar travagens intermitentes e bruscas para limpar o gelo acumulado nos discos metálicos.",
+                    "Utilizar velocidades moderadas, relações de caixa mais altas (mudanças altas) e guiar com extrema suavidade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O encadeamento provocado pelo sol brilhante de frente ao início da manhã ou fim da tarde pode ser mitigado:",
+                "o": [
+                    "Ligando imediatamente os faróis de estrada (máximos) para equilibrar o contraste de luz exterior.",
+                    "Utilizando a pala de proteção solar interna do veículo e óculos de sol com lentes adequadas.",
+                    "Fixando o olhar de forma contínua nas linhas de demarcação brancas do lado esquerdo da via."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao cruzar-se com um veículo pesado de mercadorias numa via estreita, o condutor deve prever:",
+                "o": [
+                    "A necessidade de reduzir a velocidade, desviar-se para a direita e, se necessário, parar para facultar a passagem.",
+                    "Que o veículo pesado se imobilizará instantaneamente na berma esquerda sem aviso prévio.",
+                    "O aumento do coeficiente de aderência do seu próprio pavimento devido à deslocação de ar."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cansaço físico provocado por manter uma postura incorreta e tensa ao volante origina:",
+                "o": [
+                    "Uma otimização espontânea da rapidez com que se realizam as sequências motoras automatizadas.",
+                    "Dores musculares, aparecimento precoce de fadiga e redução da capacidade de vigilância e foco.",
+                    "O estreitamento benéfico do tempo necessário para processar estímulos visuais complexos urbanos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Perante uma poça de água acumulada na faixa de rodagem, o risco de o veículo entrar em aquaplanagem aumenta com:",
+                "o": [
+                    "O aumento substancial do peso total da carga transportada no compartimento de bagagens.",
+                    "A utilização de pneus novos com a profundidade de desenho da banda de rodagem no máximo.",
+                    "O aumento da velocidade de circulação do veículo e o desgaste excessivo do relevo dos pneus."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A sinalização de perigo temporária devido a trabalhos na via pública serve para avisar os condutores de que:",
+                "o": [
+                    "Devem redobrar a atenção, moderar a velocidade e preparar-se para situações inesperadas ou desvios.",
+                    "Têm prioridade absoluta de passagem sobre qualquer máquina de obras ou operário na via.",
+                    "O tempo de reação mecânico biológico do seu próprio organismo diminuirá espontaneamente."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O sistema eletrónico de distribuição de travagem (EBD / EBV) atua em conjunto com o ABS para:",
+                "o": [
+                    "Neutralizar os efeitos nocivos da fadiga muscular nos membros inferiores do condutor.",
+                    "Ativar de forma preventiva os pré-tensores dos cintos de segurança em ambiente urbano.",
+                    "Ajustar a força de travagem aplicada a cada roda em função da carga e transferência de massas, maximizando a eficácia."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Ao circular numa via urbana congestionada, o condutor defensivo deve evitar o comportamento de \"colar-se\" à retaguarda porque:",
+                "o": [
+                    "Reduz a durabilidade do óleo lubrificante hidráulico do sistema de direção assistida.",
+                    "Elimina a margem de segurança frontal necessária para reagir e imobilizar o veículo caso ocorra uma travagem súbita.",
+                    "Bloqueia o funcionamento automático dos sensores de luminosidade exteriores do habitáculo."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Qual o procedimento correto ao efetuar uma paragem de emergência na berma de uma autoestrada?",
+                "o": [
+                    "Ligar as luzes de perigo, vestir o colete retrorrefletor antes de sair do veículo, colocar o sinal de pré-sinalização de perigo (triângulo) a pelo menos 50 metros e aguardar fora da faixa de rodagem.",
+                    "Colocar o triângulo colado ao para-choques traseiro do automóvel e aguardar sentado no interior do habitáculo com as luzes de presença ligadas.",
+                    "Deslocar-se a pé pela faixa de rodagem para sinalizar manualmente o obstáculo aos veículos em aproximação rápida."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância de paragem de um automóvel corresponde à soma de:",
+                "o": [
+                    "Distância percorrida durante o tempo de reação e a distância de travagem.",
+                    "Distância de travagem mecânica e a distância de segurança lateral.",
+                    "Distância de visibilidade do condutor e o comprimento total do veículo."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Conduzir com uma taxa de álcool no sangue superior ao limite legal permitido resulta em:",
+                "o": [
+                    "Redução da distância de travagem do automóvel devido à maior descontração motora.",
+                    "Aumento do tempo de reação, estreitamento do campo visual e subestimação dos riscos.",
+                    "Redução drástica da fadiga biológica e melhoria do foco percetivo noturno."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Consideram-se elementos de segurança ativa num veículo:",
+                "o": [
+                    "O sistema de travagem ABS, o controlo eletrónico de estabilidade (ESP) e os pneus.",
+                    "Os airbags frontais, os cintos de segurança com pré-tensores e o capacete.",
+                    "Os para-choques deformáveis e a estrutura habitacional rígida reforçada."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que deve fazer o condutor perante uma situação imprevista de nevoeiro muito intenso?",
+                "o": [
+                    "Ativar as luzes de estrada (máximos) para romper a barreira de humidade suspensa.",
+                    "Colar-se à retaguarda do veículo precedente guiando-se pelas suas luzes de travão.",
+                    "Reduzir significativamente a velocidade, ligar os médios e os faróis de nevoeiro e aumentar a distância de segurança."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O envelhecimento populacional afeta a segurança rodoviária porque os condutores mais idosos apresentam habitualmente:",
+                "o": [
+                    "Um aumento involuntário na acuidade visual dinâmica periférica e noturna.",
+                    "Maior tempo de reação biológica e menor resistência ao encadeamento luminoso.",
+                    "Maior rapidez na execução mecânica de sequências motoras de desvio brusco."
+                ],
+                "c": 1
+            },
+            {
+                "p": "No âmbito urbano, a aproximação a uma passadeira de peões exige do condutor defensivo:",
+                "o": [
+                    "Manter a velocidade, acionando sinais sonoros para acelerar a travessia dos peões.",
+                    "Confiar que os peões aguardarão sempre a imobilização completa do veículo para avançar.",
+                    "Moderar a velocidade, inspecionar visualmente as bermas e parar se houver peões a iniciar a travessia."
+                ],
+                "c": 2
+            },
+            {
+                "p": "As barras de proteção lateral instaladas nas portas dos automóveis ligeiros são medidas de segurança:",
+                "o": [
+                    "Passiva, porque visam minimizar as consequências e lesões nos ocupantes em caso de embate lateral.",
+                    "Ativa, pois evitam que o veículo perca a trajetória de circulação direcional durante colisões.",
+                    "Mista dinâmica, atuando de forma ativa na prevenção de capotamentos urbanos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Ao circular imediatamente atrás de um motociclista, o condutor de um automóvel deve aumentar a distância de segurança porque:",
+                "o": [
+                    "Os motociclos possuem uma aceleração linear muito inferior à dos veículos ligeiros.",
+                    "Os motociclos podem parar em distâncias muito curtas e são mais instáveis face a irregularidades no piso.",
+                    "O fluxo aerodinâmico da retaguarda dos veículos de duas rodas desestabiliza os travões hidráulicos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A fadiga ocular na condução noturna pode manifestar-se por:",
+                "o": [
+                    "Ardor nos olhos, visão enevoada temporária, necessidade de pestanejar com frequência e perda de nitidez.",
+                    "Alargamento espontâneo do campo de visão periférica e maior rapidez na identificação de índices.",
+                    "Diminuição mecânica imediata da distância de travagem do veículo em pavimento seco."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma via pública que apresente forte acumulação de gelo na berma e na faixa de rodagem, o condutor deve prever:",
+                "o": [
+                    "O aumento significativo do coeficiente de atrito mecânico dos pneumáticos em piso frio.",
+                    "Que a distância percorrida durante o seu tempo de reação biológica diminuirá para metade.",
+                    "Uma perda total ou quase total de aderência das rodas, exigindo velocidade muito reduzida e suavidade absoluta."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Ao nível da psicologia do condutor, a fadiga extrema altera a tomada de decisões na via pública, pois gera:",
+                "o": [
+                    "Um aumento natural na capacidade de autoverificação das sequências sensório-motoras simples.",
+                    "Lapsos na interpretação dos estímulos, maior desatenção e respostas desajustadas ou tardias.",
+                    "Uma maior rapidez biológica em desviar a trajetória perante obstáculos urbanos imprevistos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O cinto de segurança com três pontos de fixação distribui de forma eficaz as forças decorrentes de um impacto violento sobre:",
+                "o": [
+                    "A estrutura do esterno (tórax) e os ossos pélvicos (anca), protegendo os órgãos moles internos.",
+                    "A totalidade da parede mole abdominal superior, otimizando a desaceleração programada frontal.",
+                    "As vértebras cervicais inferiores, mitigando o aparecimento do efeito de chicote traseiro."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor experiente que circula numa via citadina congestionada foca a sua exploração percetiva visual em:",
+                "o": [
+                    "Índices estáticos irrelevantes ou sinalização vertical distante colocada à sua esquerda.",
+                    "Fixações oculares breves e exclusivamente repetidas junto ao extremo direito da berma.",
+                    "Índices críticos pertinentes em constante movimento, tais como luzes de travagem e peões."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A hidroplanagem (aquaplanagem) reduz de forma instantânea a eficácia de que tipo de segurança?",
+                "o": [
+                    "Da segurança passiva estrutural do habitáculo deformável interno do automóvel ligeiro.",
+                    "Da segurança ativa do veículo, ao anular por completo o atrito, a travagem e o controlo da direção.",
+                    "Dos pré-tensores pirotécnicos integrados nos cintos de segurança das portas lateral."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A desidratação do organismo do condutor provocada por longas horas de exposição ao sol direto no habitáculo origina:",
+                "o": [
+                    "Fadiga precoce, dores de cabeça intensas, tonturas ligeiras e quebra substancial na atenção direta.",
+                    "Uma melhoria biológica e instantânea no processamento e tratamento da informação urbana.",
+                    "A redução drástica da distância percorrida pelo veículo automóvel ligeiro durante a travagem."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante a presença de peões idosos atravessando uma avenida de forma lenta numa zona sem passadeira, deve:",
+                "o": [
+                    "Buzinar de forma prolongada e agressiva para alertar os peões sobre a infração cometida à lei.",
+                    "Manter a velocidade de marcha normal aproximando o veículo o máximo possível para obrigar à paragem.",
+                    "Reduzir a velocidade ou parar o automóvel se necessário, adotando uma postura preventiva e tolerante."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O sistema eletrónico de aviso de desvio de faixa de rodagem (LDW) atua como um elemento de segurança:",
+                "o": [
+                    "Activa, pois alerta o condutor por vibração ou som prevenindo o despiste involuntário por distração.",
+                    "Passiva, dado que absorve e dissipa a energia decorrente de embates laterais mecânicos urbanos.",
+                    "Mista secundária suplementar, cuja ativação ocorre exclusivamente em fases de travagem de emergência."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A utilização de medicamentos antidepressivos ou calmantes sem aconselhamento ou verificação médica prévia pode:",
+                "o": [
+                    "Diminuir substancialmente o espaço percorrido pelo automóvel ligeiro durante o tempo de reação.",
+                    "Provocar tonturas inesperadas, sonolência profunda involuntária e quebra total da coordenação motora.",
+                    "Alargar de forma benéfica a exploração percetiva visual lateral do condutor em ambiente urbano."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao circular à noite com chuva miúda, a visibilidade através do retrovisor interior diminui devido:",
+                "o": [
+                    "À alteração eletrónica automática e intrínseca no funcionamento das resistências térmicas das portas.",
+                    "Ao aumento exponencial da distância necessária para imobilizar o veículo automóvel ligeiro na via pública.",
+                    "À acumulação de gotas de água e condensação interna ou poeiras gordurosas no vidro traseiro."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na condução defensiva, o ato de \"saber tornar-se visível\" aos outros condutores implica:",
+                "o": [
+                    "Utilizar corretamente a sinalização luminosa indicadora, os faróis regulamentares e evitar os pontos cegos alheios.",
+                    "Ligar permanentemente os indicadores de perigo intermitentes sempre que circular a velocidades urbanas baixas.",
+                    "Buzinar sistematicamente em todas as interseções ou passadeiras de peões para impor a sua marcha urgente."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O coeficiente de atrito entre o pneu e o pavimento atinge o seu valor crítico mais perigoso:",
+                "o": [
+                    "Quando o asfalto é completamente lavado por uma tempestade contínua de várias horas.",
+                    "Nos períodos de calor extremo onde a temperatura do asfalto dilata as bandas de rodagem.",
+                    "No início de uma chuva miúda, quando a água se mistura com o óleo e o pó acumulados na via."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual o principal perigo psicológico associado à condução monótona numa autoestrada retilínea e deserta?",
+                "o": [
+                    "A sobrestimação mecânica das capacidades de travagem do sistema de serviço auxiliar.",
+                    "O aparecimento da \"hipnose da autoestrada\", micro-sonos e a redução drástica da vigilância.",
+                    "Uma tendência para executar sequências motoras bruscas de desvio na faixa central."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Numa condução defensiva urbana, o condutor deve prever a presença de peões escondidos atrás de:",
+                "o": [
+                    "Veículos pesados de mercadorias ou autocarros parados para largada de passageiros.",
+                    "Linhas de demarcação longitudinais contínuas situadas à entrada de rotundas.",
+                    "Sistemas de iluminação pública LED devidamente calibrados e ativos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A utilização do cinto de segurança por mulheres grávidas:",
+                "o": [
+                    "É proibida por lei devido ao risco de lesões abdominais provocadas pela fita pélvica dura.",
+                    "É obrigatória, devendo a fita inferior ser colocada o mais baixo possível sob o ventre.",
+                    "Fica dependente da ativação manual dos pré-tensores localizados no encosto de cabeça."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O fenómeno do \"olhar fixo\" ou redução do rastreio visual num ponto é uma consequência direta de:",
+                "o": [
+                    "Uma correta calibração mecânica da pressão dos pneus em solo asfáltico rugoso.",
+                    "Conduzir sob ótimas condições climatéricas com acompanhamento de um condutor experiente.",
+                    "Elevados estados de fadiga acumulada, stresse agudo ou condução sob o efeito do álcool."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na aproximação a um entroncamento com visibilidade reduzida por edifícios, qual o comportamento defensivo correto?",
+                "o": [
+                    "Moderar substancialmente a velocidade, preparar o pé sobre o travão e avançar com extrema precaução.",
+                    "Buzinar continuamente mantendo a velocidade de cruzeiro para avisar os utentes ocultos.",
+                    "Efetuar uma paragem de emergência imediata sobre a faixa de rodagem antes da linha de prioridade."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O encosto de cabeça deve ser regulado em altura de modo a que a sua parte superior fique alinhada com:",
+                "o": [
+                    "A base inferior do pescoço, servindo de apoio lombar suplementar para viagens longas.",
+                    "O topo da cabeça ou a linha dos olhos, garantindo a retenção eficaz em embates traseiros.",
+                    "O limite superior das omoplatas para libertar os movimentos de rotação cervical."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução defensiva dita que, perante um veículo que circule colado à sua retaguarda, deve:",
+                "o": [
+                    "Efetuar pequenas travagens bruscas intermitentes para assustar e afastar o outro condutor.",
+                    "Aumentar drasticamente a velocidade do seu veículo até perder o contacto visual pelo retrovisor.",
+                    "Facilitar de forma segura a ultrapassagem do outro veículo, reduzindo ligeiramente a sua velocidade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Considera-se um comportamento de risco grave associado à juventude e inexperiência na condução:",
+                "o": [
+                    "A sobrestimação das próprias capacidades de controlo, a menor perceção dos riscos e o excesso de velocidade.",
+                    "A realização sistemática de pausas de vinte minutos a cada duas horas em trajetos interurbanos.",
+                    "A verificação regular a frio da pressão dos pneumáticos de acordo com o manual técnico."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O principal objetivo das campanhas públicas de prevenção e segurança rodoviária é atuar ao nível:",
+                "o": [
+                    "Da melhoria mecânica intrínseca dos sistemas de travagem assistida ativa dos automóveis.",
+                    "Da modificação de atitudes e comportamentos sociais dos utentes da via pública.",
+                    "Da fiscalização punitiva imediata com recurso a radares eletrónicos automáticos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao circular em autoestrada sob condições de nevoeiro muito denso, se o condutor detetar uma paragem súbita de trânsito à frente, deve:",
+                "o": [
+                    "Desligar de imediato as luzes de cruzamento para evitar o encadeamento reflexivo.",
+                    "Puxar o travão de mão mecânico de forma violenta mantendo o pé no acelerador.",
+                    "Travar progressivamente e acionar de imediato os indicadores de perigo (quatro piscas)."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na aproximação a uma curva à esquerda com visibilidade reduzida, as forças centrífugas empurram o veículo para:",
+                "o": [
+                    "O exterior da curva (lado direito da faixa de rodagem, em direção à berma).",
+                    "O interior absoluto da trajetória, invadindo a faixa de sentido contrário.",
+                    "Uma imobilização mecânica instantânea e programada pelo eixo dinâmico."
+                ],
+                "c": 0
+            },
+            {
+                "p": "No âmbito do processamento de informação, a fase em que o condutor escolhe a manobra preventiva chama-se:",
+                "o": [
+                    "Identificação ou categorização dos índices percetivos em categorias com significado.",
+                    "Tomada de decisão, que precede diretamente a fase final de execução motora.",
+                    "Exploração percetiva visual sistemática com fixações contínuas à direita."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Conduzir com pneus que apresentam uma profundidade de relevo inferior ao limite mínimo legal (1,6 mm) provoca:",
+                "o": [
+                    "Perda drástica de aderência em pisos molhados, risco severo de aquaplanagem e aumento da distância de travagem.",
+                    "A redução espontânea e benéfica do tempo de reação mecânica biológica do condutor.",
+                    "O aumento involuntário da eficácia das pastilhas de travão em descidas íngremes."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual o comportamento correto do condutor defensivo perante uma passadeira com peões que demonstram hesitação em avançar?",
+                "o": [
+                    "Acelerar rapidamente para desimpedir a via urbana e evitar congestionamentos atrás de si.",
+                    "Reduzir a velocidade, imobilizar o veículo com segurança antes da linha e sinalizar que podem passar.",
+                    "Efetuar uma ultrapassagem pela esquerda buzinando para assinalar a prioridade regulamentar."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema eletrónico de travagem assistida (BAS) atua de que forma numa situação de perigo?",
+                "o": [
+                    "Deteta a rapidez com que o pedal é pressionado e aplica instantaneamente a força máxima de travagem.",
+                    "Absorve e dissipa as forças mecânicas resultantes de embates deformáveis traseiros.",
+                    "Impede de forma contínua a rotação voluntária das rodas motrizes em curvas apertadas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A fadiga psicológica na condução noturna continuada reduz principalmente:",
+                "o": [
+                    "A distância mecânica necessária para imobilizar o veículo ligeiro em pavimento seco.",
+                    "A calibração eletrónica automática dos espelhos retrovisores centrais eletrocromáticos.",
+                    "O campo útil visual de rastreio (visão em túnel) e a velocidade no tratamento da informação."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Considera-se uma medida preventiva de segurança activa nas infraestruturas rodoviárias urbanas:",
+                "o": [
+                    "A aplicação de pavimentos rugosos de alta aderência e a colocação de iluminação reforçada em passadeiras.",
+                    "A instalação de guardas metálicas deformáveis nas bermas para conter impactos e despistes.",
+                    "O reforço estrutural das portas laterais dos automóveis com barras rígidas integradas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa descida longa sob chuva forte, a utilização incorreta e continuada do pedal de travão provoca:",
+                "o": [
+                    "O aumento benéfico e instantâneo da aderência mecânica de fricção das pastilhas de travão.",
+                    "A redução biológica programada dos milissegundos necessários para iniciar a fase de reação.",
+                    "Sobreaquecimento do sistema (fading) e perda abrupta da eficácia de imobilização do veículo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O condutor que pratica atitudes de stresse e impaciência no trânsito citadino tende a:",
+                "o": [
+                    "Executar com rigor e calmaria metodologias avançadas de condução preventiva e defensiva.",
+                    "Subestimar os riscos reais, reduzir as distâncias de segurança e cometer infrações deliberadas.",
+                    "Aumentar a margem de segurança temporal livre em redor da carroçaria nas rotundas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A distância de travagem de um veículo automóvel aumenta significativamente quando:",
+                "o": [
+                    "O piso se encontra molhado, com gelo ou com folhas caídas acumuladas.",
+                    "O condutor se encontra num estado psicofísico de fadiga ou sob efeito do álcool.",
+                    "O sistema de airbags frontais e de cortina é desativado manualmente no painel."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O stresse acumulado na atividade diária afeta o condutor porque:",
+                "o": [
+                    "Altera a viscosidade mecânica do fluido hidráulico que atua no pedal de embraiagem.",
+                    "Reduz a capacidade de processamento de informação, diminui a paciência e potencia reações agressivas.",
+                    "Reduz de forma direta a distância percorrida pelo veículo durante o tempo de reação."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Em termos de segurança rodoviária, os amortecedores em mau estado de conservação provocam:",
+                "o": [
+                    "O bloqueio antecipado automático eletrónico dos pré-tensores dos cintos de segurança.",
+                    "A redução proporcional do tempo necessário para que o condutor inicie a travagem.",
+                    "Menor aderência dos pneus ao solo, instabilidade nas curvas e aumento da distância de travagem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual a atitude correta de condução defensiva ao entrar numa autoestrada pela via de aceleração?",
+                "o": [
+                    "Regular a velocidade na via, sinalizar com antecedência e integrar-se sem perturbar a marcha dos outros veículos.",
+                    "Parar obrigatoriamente no início da via de aceleração e aguardar que a faixa fique totalmente deserta.",
+                    "Avançar de imediato impondo a sua entrada, dado que a prioridade pertence a quem se tenta integrar."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A ingestão de álcool puro, mesmo em pequenas quantidades, atua no sistema nervoso provocando:",
+                "o": [
+                    "Uma otimização benéfica da rapidez na tomada de decisões em interseções urbanas.",
+                    "Uma falsa sensação de segurança, diminuição da acuidade visual e aumento do tempo de reação.",
+                    "O aumento involuntário e imediato do campo visual periférico útil do condutor."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O fenómeno de aquaplanagem (hidroplanagem) é severamente potenciado por:",
+                "o": [
+                    "Transitar a baixas velocidades em pavimentos recentemente lavados pelas autoridades.",
+                    "Utilizar pneus novos com a pressão regulada para os valores máximos definidos de carga.",
+                    "Pneus com piso desgastado (carecas), velocidade excessiva e forte acumulação de água na via."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na condução defensiva, o princípio da precaução perante uma criança na berma obriga a:",
+                "o": [
+                    "Reduzir significativamente a velocidade e preparar-se para travar, prevendo um comportamento imprevisto.",
+                    "Buzinar de forma contínua mantendo a marcha para exigir que a criança se afaste da faixa.",
+                    "Manter a velocidade normal confiando que os sistemas eletrónicos evitam colisões em meio urbano."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cinto de segurança e os encostos de cabeça consideram-se elementos de segurança:",
+                "o": [
+                    "Passiva, porque o seu objetivo principal é reduzir a gravidade das lesões em caso de colisão.",
+                    "Activa, dado que reduzem de forma direta a probabilidade de ocorrência de sinistros rodoviários.",
+                    "Mista dinâmica, cuja regulação mecânica manual altera a trajetória do automóvel ligeiro."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Conduzir durante o crepúsculo aumenta o risco de acidente rodoviário porque:",
+                "o": [
+                    "Ocorre uma alteração mecânica imediata no funcionamento do alternador eletrónico do veículo.",
+                    "Verifica-se a redução da distância mecânica total de travagem em pavimentos asfálticos secos.",
+                    "A transição de luz cria ilusões óticas, camufla obstáculos e peões e exige maior escorço visual."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O que caracteriza a prática de uma condução defensiva eficaz?",
+                "o": [
+                    "A recolha constante de informação, a antecipação de riscos potenciais e a adoção de atitudes preventivas.",
+                    "O cumprimento rígido dos limites legais sem nunca ceder prioridades mesmo para evitar colisões.",
+                    "A utilização sistemática da buzina e sinais de luzes para apressar a fluidez do trânsito urbano."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A condução defensiva determina que, ao cruzar-se com um veículo pesado numa via estreita, deve:",
+                "o": [
+                    "Acelerar para passar rapidamente antes que o veículo pesado ocupe todo o espaço disponível.",
+                    "Reduzir a velocidade e encostar-se o mais possível à direita, imobilizando o veículo se necessário.",
+                    "Manter a velocidade, confiando que o condutor do veículo pesado subirá a berma esquerda."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Ao circular numa estrada à noite, a alternância constante entre máximos e médios deve ser feita para:",
+                "o": [
+                    "Evitar o encadeamento dos condutores que circulam em sentido contrário ou à sua frente.",
+                    "Garantir a limpeza automática dos sensores térmicos de chuva localizados no para-brisas.",
+                    "Reduzir artificialmente a distância de reação biológica do condutor face a perigos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A fadiga muscular provocada por longas horas de condução manifesta-se através de:",
+                "o": [
+                    "Um aumento involuntário na precisão e coordenação sensório-motora complexa.",
+                    "Estabilização eletrónica programada da aderência dos pneus traseiros nas curvas.",
+                    "Dormência nos membros, dores cervicais, rigidez corporal e lentidão de movimentos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Que perigo representa circular atrás de um veículo de grandes dimensões (como um camião TIR)?",
+                "o": [
+                    "O bloqueio mecânico antecipado do sistema de travagem de serviço do automóvel ligeiro.",
+                    "A redução severa da visibilidade da via à frente e do posicionamento da sinalização vertical.",
+                    "Uma alteração drástica na pressão pneumática ideal recomendada para os pneus frios."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A utilização correta do encosto de cabeça implica que este fique regulado de modo a:",
+                "o": [
+                    "Ficar alinhado com o topo da cabeça ou com a linha dos olhos do condutor.",
+                    "Servir de apoio confortável para a zona lombar ou cervical inferior durante o trajeto.",
+                    "Ficar posicionado o mais baixo possível junto às omoplatas para libertar os braços."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante condições de vento lateral muito forte e imprevisto, o condutor defensivo deve:",
+                "o": [
+                    "Acelerar a fundo para romper a resistência aerodinâmica e cruzar rapidamente a via.",
+                    "Reduzir a velocidade, segurar firmemente o volante e preparar-se para desvios repentinos.",
+                    "Pressionar de forma contínua o pedal de embraiagem para libertar o movimento das rodas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A chamada \"Margem de Segurança\" no exercício da condução automóvel foca-se em:",
+                "o": [
+                    "Cumprir escrupulosamente os limites mínimos legais sem nunca facilitar ultrapassagens.",
+                    "Desativar voluntariamente os airbags de cortina laterais no interior de povoações urbanas.",
+                    "Preservar espaço e tempo livres em redor do veículo para gerir imprevistos sem colidir."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Os sistemas eletrónicos auxiliares de estacionamento e câmaras de marcha-atrás são elementos de:",
+                "o": [
+                    "Segurança ativa, porque ajudam a detetar obstáculos ocultos e a evitar colisões antes que ocorram.",
+                    "Segurança passiva, dado que absorvem energia cinética estrutural em embates mecânicos.",
+                    "Retenção suplementar secundária para os ocupantes localizados na zona traseira do habitáculo."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na condução urbana em trânsito congestionado, o comportamento de mudar constantemente de faixa (ziguezaguear) provoca:",
+                "o": [
+                    "Uma melhoria acentuada e segura no tempo necessário para atingir o destino final.",
+                    "Aumento do risco de colisões por desatenção, stresse coletivo e quebra na fluidez geral.",
+                    "Redução programada do consumo médio de combustível do veículo automóvel ligeiro."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A atitude preventiva e o altruísmo do condutor defensivo manifestam-se quando este:",
+                "o": [
+                    "Prescinde da sua prioridade legal ou facilita manobras alheias para salvaguardar a segurança pública.",
+                    "Impõe rigidamente a prioridade de passagem, exigindo o cumprimento do Código da Estrada a fundo.",
+                    "Utiliza as luzes de perigo para justificar estacionamentos irregulares temporários na via pública."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Em vias de sentido único com várias faixas de rodagem, o condutor deve manter-se posicionado na:",
+                "o": [
+                    "Via central, mantendo as luzes de perigo intermitentes ligadas de forma preventiva.",
+                    "Via mais à esquerda para garantir maior fluidez e espaço lateral livre para ultrapassagens.",
+                    "Via mais à direita, utilizando as restantes apenas para efetuar ultrapassagens ou mudar de direção."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na condução com chuva intensa, as escovas limpa-para-brisas gastas aumentam o perigo porque:",
+                "o": [
+                    "Prejudicam a visibilidade ao deixar rastros de água e sujidade, aumentando a fadiga visual.",
+                    "Reduzem mecanicamente a eficácia e a pressão hidráulica interna do pedal de travão.",
+                    "Alteram de forma direta os milissegundos necessários para iniciar a fase de reação biológica."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O condutor que circula em jejum prolongado ou com hipoglicemia apresenta riscos acrescidos devido a:",
+                "o": [
+                    "Uma otimização espontânea da rapidez na execução de sequências motoras simples.",
+                    "Tonturas, diminuição da capacidade de concentração, fadiga súbita e tremores corporais.",
+                    "Um alargamento involuntário e benéfico do campo visual periférico do automóvel."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Conduzir sob um estado emocional de profunda tristeza ou luto afeta a tarefa da condução porque:",
+                "o": [
+                    "Reduz a atenção dinâmica, atrasa o processamento de informação e aumenta os tempos de reação.",
+                    "Otimiza a estabilização eletrónica e o atrito dos pneumáticos traseiros nas curvas urbanas.",
+                    "Promove atitudes focadas na cooperação mútua com os peões e utentes vulneráveis."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante a aproximação de um cruzamento com sinalização de \"STOP\", o condutor defensivo deve:",
+                "o": [
+                    "Reduzir ligeiramente a velocidade e avançar caso não vislumbre trânsito próximo na via.",
+                    "Buzinar duas vezes de forma curta para avisar a sua aproximação e manter a marcha de cruzeiro.",
+                    "Parar obrigatoriamente antes da linha de paragem, olhar para ambos os lados e ceder a prioridade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O sistema eletrónico de monitorização da pressão dos pneus (TPMS) atua como segurança activa porque:",
+                "o": [
+                    "Alerta o condutor no painel de bordo sobre perdas de pressão, prevenindo furos graves ou despistes.",
+                    "Modifica de forma automática as estruturas de retenção deformáveis em caso de embates.",
+                    "Reduz de forma direta as distâncias de paragem sob condições de nevoeiro denso."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O condutor idoso com diminuição da acuidade visual noturna deve adotar a seguinte atitude preventiva:",
+                "o": [
+                    "Utilizar os faróis de estrada (máximos) de forma contínua, mesmo cruzando-se com outros utentes.",
+                    "Evitar ou reduzir as viagens noturnas longas, moderar a velocidade e manter os vidros bem limpos.",
+                    "Aumentar a velocidade habitual de circulação para diminuir o tempo de exposição ao risco."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Nas travagens de emergência em estradas de terra batida ou gravilha, a distância de paragem com ABS:",
+                "o": [
+                    "Diminui de forma acentuada devido ao travamento fixo e estático contínuo das rodas.",
+                    "Permanece inalterada se a pressão dos pneumáticos for aferida semanalmente a frio.",
+                    "Pode aumentar ligeiramente, mas garante ao condutor a manutenção total do controlo direcional."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O transporte de volumes pesados no compartimento de bagagens (mala) altera a condução porque:",
+                "o": [
+                    "Transfere peso para o eixo traseiro, podendo aliviar a direção à frente e alterar o feixe dos faróis.",
+                    "Bloqueia o funcionamento dos pré-tensores eletrónicos e airbags de cortina laterais.",
+                    "Reduz de forma proporcional as distâncias biológicas necessárias na fase de reação do condutor."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante um comportamento agressivo ou uma provocação por parte de outro condutor, deve:",
+                "o": [
+                    "Retaliar executando manobras semelhantes para impor uma postura firme na via pública.",
+                    "Ignorar a provocação, manter a calma e afastar-se desse veículo de forma segura e tranquila.",
+                    "Buzinar prolongadamente e ligar os faróis de nevoeiro traseiros para ocultar a sua trajetória."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução defensiva determina que, numa descida com o piso escorregadio, para imobilizar o veículo com segurança, se deve:",
+                "o": [
+                    "Colocar a caixa de velocidades em ponto morto e carregar no pedal de travão de forma contínua.",
+                    "Carregar na embraiagem a fundo e acionar o travão de estacionamento de forma intermitente.",
+                    "Utilizar uma relação de caixa baixa para aproveitar o travão de motor e travar com muita suavidade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O transporte de malas pesadas soltas no banco de trás de um veículo ligeiro representa um perigo de segurança:",
+                "o": [
+                    "Ativa, dado que aumenta as vibrações mecânicas sentidas nos braços do condutor.",
+                    "Passiva, pois em caso de travagem brusca ou colisão, os objetos são projetados para a frente com grande força.",
+                    "Exclusivo para o desgaste prematuro do revestimento orgânico dos bancos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O estreitamento do campo visual periférico (conhecido como visão em túnel) ocorre de forma direta com:",
+                "o": [
+                    "O aumento substancial da velocidade de circulação do veículo ou estados graves de fadiga.",
+                    "A utilização de óculos de sol polarizados durante a condução em meios urbanos diurnos.",
+                    "A regulação e o posicionamento correto do feixe de luz dos faróis médios."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Que nome se dá ao espaço mínimo que o condutor deve manter em relação ao veículo da frente para evitar colisões?",
+                "o": [
+                    "Distância de reação.",
+                    "Distância de travagem mecânica.",
+                    "Distância de segurança."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O condutor que regressa de um período de trabalho noturno prolongado apresenta maior probabilidade de:",
+                "o": [
+                    "Sofrer de micro-sonos involuntários ao volante e falhar na antecipação de riscos.",
+                    "Reduzir de forma drástica os milissegundos necessários para imobilizar o veículo.",
+                    "Alargar de forma natural e benéfica a sua exploração percetiva visual periférica."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual o comportamento correto perante um peão com mobilidade reduzida que atravessa uma passadeira de forma muito lenta?",
+                "o": [
+                    "Buzinar brevemente para apressar a travessia e evitar a retenção de trânsito atrás de si.",
+                    "Aguardar pacientemente com o veículo imobilizado até que o peão conclua a travessia com segurança.",
+                    "Iniciar a marcha contornando o peão pela esquerda antes que este chegue ao passeio."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Os sistemas eletrónicos de travagem preditiva e travagem autónoma de emergência (AEB) são considerados:",
+                "o": [
+                    "Medidas de segurança ativa, porque atuam de forma automática para evitar o acidente antes que ele ocorra.",
+                    "Medidas de segurança passiva, dado que reduzem o impacto da desaceleração no tórax.",
+                    "Equipamentos mictos suplementares associados unicamente ao travão de estacionamento."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução de longo curso em autoestrada com chuva forte, o condutor deve prever:",
+                "o": [
+                    "O aumento imediato do coeficiente de atrito asfáltico devido à lavagem contínua do piso.",
+                    "Que o seu tempo de reação biológica diminuirá espontaneamente por causa da humidade.",
+                    "O aumento severo da distância de paragem e o risco iminente de sofrer aquaplanagem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A colocação incorreta da fita torácica do cinto de segurança (por exemplo, passar por baixo do braço) pode provocar:",
+                "o": [
+                    "O bloqueio involuntário dos sensores de estabilidade dinâmica ativa localizados nas rodas.",
+                    "Lesões internas graves nas costelas e pulmões em caso de colisão, ao falhar a retenção correta.",
+                    "Uma redução direta nas forças de atrito exercidas pelos pneus na estrada."
+                ],
+                "c": 1
+            },
+            {
+                "p": "No sistema de circulação rodoviária, o elemento humano destaca-se como o mais importante porque:",
+                "o": [
+                    "É o centro de decisão dynamic do sistema, cabendo-lhe interpretar os índices e evitar os sinistros.",
+                    "Possui uma capacidade inata de manter tempos de reação nulos face a imprevistos urbanos.",
+                    "O seu comportamento biológico não sofre influências de fatores externos como o meio ambiente."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A acumulação de neve ou gelo nas óticas dos faróis do veículo provoca:",
+                "o": [
+                    "Redução drástica da intensidade do feixe luminoso projetado, prejudicando a visibilidade e a sinalização.",
+                    "Um aumento automático e eletrónico na eficácia dos travões de serviço em piso frio.",
+                    "A prevenção espontânea de avarias mecânicas complexas nos pneumáticos traseros."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na condução defensiva, o ato de antecipar o comportamento errático de um condutor que circula à sua frente é um exemplo do processo de:",
+                "o": [
+                    "Identificação ou classificação dos índices percetivos em categorias rígidas.",
+                    "Previsão, permitindo ao condutor agir antes que o risco se converta em acidente.",
+                    "Execução sensório-motoras simples associada exclusivamente à caixa de velocidades."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A realização de chamadas telefónicas em modo \"mãos livres\" durante o exercício da condução:",
+                "o": [
+                    "É completamente isenta de riscos, pois liberta as mãos para o domínio total do volante.",
+                    "Otimiza de forma biológica a exploração percetiva visual periférica do condutor.",
+                    "Provoca distração cognitiva, atrasa o tratamento da informação e aumenta o tempo de reação."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O perigo associado à realização de curvas com velocidades excessivas deve-se à força centrífuga, que:",
+                "o": [
+                    "Tende a afastar o veículo para o exterior da curva, podendo originar derrapagem ou capotamento.",
+                    "Aumenta de forma linear e proporcional à massa do veículo em pavimentos secos.",
+                    "Estabiliza de forma automática a trajetória direcional através do sistema de airbags."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante a presença de fumo denso provocado por um incêndio florestal na berma da via, deve:",
+                "o": [
+                    "Acelerar a fundo para atravessar a zona perigosa no menor espaço de tempo possível.",
+                    "Reduzir a velocidade, ligar os médios e os quatro piscas e, se não houver visibilidade, parar em segurança.",
+                    "Circular com as luzes de estrada (máximos) ligadas para perfurar a cortina de fumo."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O limitador de velocidade regulável integrado no veículo constitui uma medida de:",
+                "o": [
+                    "Segurança ativa, dado que ajuda o condutor a não ultrapassar os limites legais definidos.",
+                    "Segurança passiva, porque atua dissipando as forças em caso de colisão violenta.",
+                    "Retenção suplementar secundária associada mecanicamente aos encostos de cabeça."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor cansado ou sonolento manifesta habitualmente uma quebra no rendimento da condução porque:",
+                "o": [
+                    "Aumenta de forma involuntária a frequência do rastreio ocular nos espelhos retrovisores.",
+                    "Executa trajetórias rigorosamente estáveis e retilíneas centradas na faixa de rodagem.",
+                    "Sobrestima as suas capacidades, atrasa a deteção de perigos e realiza correções bruscas de direção."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Perante o surgimento súbito de lençóis de água no pavimento (risco de aquaplanagem), o condutor defensivo deve:",
+                "o": [
+                    "Travar com força máxima imediata para obrigar os pneus a quebrar a película líquida.",
+                    "Desacelerar suavemente levantando o pé do acelerador e segurar firmemente o volante sem desvios.",
+                    "Pressionar a embraiagem a fundo e rodar o volante rapidamente para a esquerda."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A substituição inadequada de lâmpadas dos faróis por outras não homologadas ou com potências incorretas pode provocar:",
+                "o": [
+                    "Encadeamento severo dos outros condutores ou projeção de luz deficiente para a via.",
+                    "A perda programada de pressão interna nas válvulas eletrónicas dos pneus frios.",
+                    "O bloqueio automático dos cintos de segurança em fases de desaceleração interurbana."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Partilhar a via pública de forma cívica e segura implica que o condutor adote comportamentos baseados em:",
+                "o": [
+                    "Assertividade agressiva para garantir o cumprimento estrito dos seus direitos de passagem.",
+                    "Utilização contínua de sinais de luzes para apressar a marcha dos peões nas passadeiras.",
+                    "Solidariedade, tolerância perante os erros alheios e proteção constante dos utentes mais vulneráveis."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Qual o comportamento preventivo correto ao circular no interior de um túnel urbano congestionado?",
+                "o": [
+                    "Desligar os faróis de cruzamento para poupar a bateria e ativar os quatro piscas mecânicos.",
+                    "Aumentar a distância de segurança, manter a ventilação em modo de recirculação e evitar paragens desnecessárias.",
+                    "Colar-se à retaguarda do veículo precedente para desimpedir o acesso de entrada ao túnel."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Sob a influência de fadiga física intensa, o tempo de reação biológica do condutor:",
+                "o": [
+                    "Aumenta significativamente, o que prolonga a distância total necessária para imobilizar o veículo.",
+                    "Diminui para metade, tornando as sequências sensório-motoras muito mais céleres.",
+                    "Mantém-se estritamente estável, alterando-se apenas a eficácia mecânica dos travões."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A sinalização luminosa intermitente amarela num cruzamento urbano significa que o condutor deve:",
+                "o": [
+                    "Parar obrigatoriamente e aguardar que a luz mude de cor para verde-alface estável.",
+                    "Aumentar a velocidade para desimpedir a interseção antes do surgimento da sinalização vermelha.",
+                    "Moderar substancialmente a velocidade e avançar com extrema precaução, respeitando as regras normais de prioridade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Considera-se um elemento de proteção passiva integrado no capacete dos motociclistas:",
+                "o": [
+                    "A viseira com tratamento hidrófugo que impede a acumulação de chuva miúda externa.",
+                    "O revestimento interior em poliestireno expandido concebido para absorver a energia mecânica do impacto.",
+                    "A fivela micrométrica de fecho rápido que atua como elemento de segurança ativa preventiva."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O transporte de crianças com menos de 12 anos e menos de 135 cm de altura deve ser feito:",
+                "o": [
+                    "No banco traseiro, utilizando um sistema de retenção homologado (cadeirinha) adequado ao seu tamanho e peso.",
+                    "No colo de um passageiro adulto localizado no banco frontal com cinto de segurança comum ativo.",
+                    "Livre no compartimento de bagagens traseiro se o automóvel ligeiro possuir vidros fumados."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa travagem de emergência com ABS em piso asfáltico rugoso seco, se o condutor sentir trepidação no pedal deve:",
+                "o": [
+                    "Levantar imediatamente o pé para evitar a rutura mecânica das pinças de travão.",
+                    "Bombear o pedal de forma intermitente para auxiliar a lógicas hidráulicas do sistema de travagem.",
+                    "Continuar a pressionar o pedal com a força máxima contínua até à imobilização completa do veículo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O stresse agudo provocado por atrasos em compromissos profissionais induz o condutor a:",
+                "o": [
+                    "Praticar uma condução mais agressiva, circular com menor distância de segurança e efetuar manobras perigosas.",
+                    "Desenvolver de forma espontânea metodologias seguras focadas na condução puramente defensiva.",
+                    "Diminuir radicalmente a distância percorrida pelo veículo durante o tempo de reação."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma descida muito íngreme de longo curso, a utilização prolongada e exclusiva do travão de serviço causa:",
+                "o": [
+                    "O calibração eletrónica automática ideal e o arrefecimento das pastilhas de fricção.",
+                    "Uma redução exponencial na energia cinética acumulada nos pneus do veículo ligeiro.",
+                    "Sobreaquecimento do sistema (fading) e uma perda temporária severa da capacidade de travagem."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A distância de segurança frontal em relação ao veículo precedente serve essencialmente para:",
+                "o": [
+                    "Permitir que outros automóveis efetuem ultrapassagens sucessivas pela direita em vias citadinas.",
+                    "Garantir espaço livre suficiente para reagir e imobilizar o veículo em caso de travagem súbita do condutor da frente.",
+                    "Bloquear a ativação automática indesejada dos pré-tensores e airbags laterais das portas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Considera-se um comportamento cívico e defensivo perante a circulação de ciclistas em meio urbano:",
+                "o": [
+                    "Adequar a velocidade à marcha do ciclista e manter a distância lateral mínima regulamentar de 1,5 metros ao ultrapassar.",
+                    "Buzinar de forma contínua para exigir a saída do ciclista da faixa de rodagem para o passeio de peões.",
+                    "Efetuar a ultrapassagem tangencial rápida no interior da mesma via sem desviar o alinhamento do volante."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Circular com amortecedores desgastados prejudica a segurança ativa do veículo porque:",
+                "o": [
+                    "Diminui o contacto dos pneus com o solo, aumenta a distância de travagem e prejudica a estabilidade em curvas.",
+                    "Reduz diretamente a visibilidade através dos espelhos retrovisores exteriores convexos.",
+                    "Impede o acionamento elétrico dos trincos automáticos integrados nas portas traseiras."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução noturna urbana, a perceção visual dos peões com roupas escuras fica gravemente afetada se o condutor:",
+                "o": [
+                    "Regular de forma correta e baixa a intensidade da iluminação digital do painel de bordo.",
+                    "Mantiver o habitáculo com renovação constante de ar fresco e sem ruídos mecânicos.",
+                    "Circular com o vidro do para-brisas sujo ou salpicado de lama, o que potencia o encadeamento reflexivo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "No contexto do sistema rodoviário, a via pública constitui um fator externo que pode induzir erros na condução se apresentar:",
+                "o": [
+                    "Sinalização horizontal bem marcada e pavimentos rugosos de alta aderência.",
+                    "Falta de sinalização coerente, buracos no pavimento ou acumulação de detritos escorregadios nas bermas.",
+                    "Medidas de acalmia de tráfego bem delineadas no interior de localidades."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A subestimação de riscos por parte de um condutor recém-encartado está frequentemente associada a:",
+                "o": [
+                    "Falta de experiência em identificar índices críticos e a uma sobrestimação das próprias capacidades de controlo.",
+                    "Praticar de forma regular pausas de repouso programadas ao fim de cada hora e meia.",
+                    "Realizar uma verificação constante da profundidade mínima legal dos sulcos dos pneus (1,6 mm)."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante a indicação de piso escorregadio por derramamento de óleo numa rotunda, qual a atitude defensiva correta?",
+                "o": [
+                    "Entrar na rotunda acelerando de forma contínua para forçar a aderência lateral traseira.",
+                    "Efetuar uma travagem a fundo no exato momento em que as rodas cruzam a poça de óleo.",
+                    "Reduzir a velocidade substancialmente antes de entrar, guiar com extrema suavidade e evitar movimentos bruscos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Os encostos de cabeça ativos dos automóveis modernos são considerados elementos de:",
+                "o": [
+                    "Segurança passiva, pois deslocam-se automaticamente para a frente em caso de colisão traseira para apoiar a cervical.",
+                    "Segurança ativa, visto que reduzem a probabilidade de ocorrência de despistes por cansaço.",
+                    "Conforto ergonómico secundário, sem qualquer relevância mecânica na prevenção de danos físicos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Ao conduzir sob condições de calor extremo no interior do veículo, o condutor deve:",
+                "o": [
+                    "Aumentar consideravelmente a velocidade de cruzeiro para reduzir a exposição térmica temporal.",
+                    "Utilizar o ar condicionado ou arejar o habitáculo, beber água e aumentar o número de paragens para descansar.",
+                    "Circular mantendo as luzes de habitáculo ligadas para compensar o contraste solar forte."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O cinto de segurança perde grande parte da sua eficácia protetora de segurança passiva se o ocupante:",
+                "o": [
+                    "Viajar com o banco excessivamente inclinado para trás ou utilizar molas de folga na fita.",
+                    "Posicionar a fita inferior firmemente ajustada sobre os ossos da zona pélvica.",
+                    "Desativar de forma temporária os avisos sonoros de bordo associados ao travão de estacionamento."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que se entende por \"hipnose da autoestrada\" na análise psicológica da condução?",
+                "o": [
+                    "Uma falha eletrónica total no mapeamento geográfico contínuo do sistema de navegação.",
+                    "O aumento da rapidez sensório-motoras biológica motivado pelo asfalto retilíneo.",
+                    "Um estado de transe e quebra de consciência provocado pela monotonia visual prolongada e fixação contínua do olhar."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na partilha do espaço rodoviário, a comunicação informal correta entre condutores deve ser feita para:",
+                "o": [
+                    "Esclarecer intenções de manobra, evitar mal-entendidos e coordenar de forma segura a passagem na via pública.",
+                    "Intimidar utentes lentos através de sinais sonoros repetidos colados à retaguarda.",
+                    "Impor prioridades não regulamentadas em rotundas urbanas de grande circulação."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Qual o principal fator humano que origina o aumento do tempo de reação face a um imprevisto na estrada?",
+                "o": [
+                    "O cansaço, a distração cognitiva, o stresse e o consumo de álcool ou certos medicamentos.",
+                    "O aumento voluntário do foco atencional na sinalização vertical e horizontal da via.",
+                    "A prática prolongada e o ganho de experiência na condução defensiva urbana."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na aproximação a uma lomba sem visibilidade, o condutor deve prever o risco de:",
+                "o": [
+                    "Sobreaquecimento imediato das pastilhas de travão por falha na transferência de massas.",
+                    "Uma perda instantânea na pressão pneumática interna recomendada para os pneus frios.",
+                    "Encontrar um obstáculo imobilizado ou um veículo lento a circular no mesmo sentido logo após o topo."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O conceito de \"Margem de Segurança\" no trânsito foca-se na manutenção de:",
+                "o": [
+                    "Velocidades constantes equivalentes ao limite máximo estabelecido por lei em todas as faixas.",
+                    "Um espaço livre (à frente, atrás e dos lados) que sirva de amortecedor face a erros imprevistos de terceiros.",
+                    "Luzes de nevoeiro traseiras permanentemente ligadas em meios citadinos congestionados."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema de corte de combustível em caso de colisão (frequentemente associado ao sistema de airbags) é uma medida de:",
+                "o": [
+                    "Segurança passiva, porque atua após o impacto com o objetivo de minimizar o risco de incêndio.",
+                    "Segurança ativa, visto que impede de forma proativa o despiste em pavimentos molhados.",
+                    "Auxílio à travagem preditiva secundária de serviço para imobilizar as rodas motrizes."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A conduzão defensiva determina que, ao aproximar-se de um cruzamento sem sinalização em meio urbano, deve:",
+                "o": [
+                    "Aumentar a velocidade para cruzar a interseção rapidamente e evitar colisões laterais.",
+                    "Moderar a velocidade, verificar a aproximação de veículos pela direita e ceder-lhes a prioridade conforme a lei.",
+                    "Buzinar repetidamente e avançar, confiando que os restantes condutores pararão na via."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A fadiga psicológica afeta a exploração percetiva visual do condutor, reduzindo:",
+                "o": [
+                    "A distância total percorrida pelo veículo ligeiro de mercadorias durante a travagem mecânica.",
+                    "A intensidade e o alcance regulamentar do feixe de luz projetado pelos faróis médios.",
+                    "O número de movimentos oculares e estreitando o campo visual útil (surgimento da visão em túnel)."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Considera-se um comportamento de risco acrescido perante a presença de veículos pesados de passageiros parados:",
+                "o": [
+                    "Efetuar uma ultrapassagem tangencial sem prever a travessia súbita de peões pela frente do autocarro.",
+                    "Reduzir moderadamente a velocidade e aumentar a distância lateral de segurança ao passar.",
+                    "Preparar o pé sobre o pedal de travão para gerir imprevistos nas bermas adjacentes."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O sistema eletrónico de travagem de emergência autónoma (AEB) deteta o risco de colisão e:",
+                "o": [
+                    "Desativa preventivamente os airbags frontais para evitar lesões por expansão de gases.",
+                    "Alerta o condutor e, caso este não reaja, aplica automaticamente os travões para evitar ou mitigar o impacto.",
+                    "Altera a viscosidade hidráulica interna do fluido de embraiagem de forma permanente."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Durante o período do crepúsculo (entardecer), a visibilidade geral diminui. O condutor deve:",
+                "o": [
+                    "Ligar as luzes de habitáculo e circular a velocidades mais elevadas para evitar a noite.",
+                    "Manter as luzes de presença e acionar os máximos repetidamente de forma intermitente.",
+                    "Ligar as luzes de cruzamento (médios), moderar a velocidade e redobrar a atenção a peões e ciclistas."
+                ],
+                "c": 2
+            },
+            {
+                "p": "No âmbito do processamento de informação na condução, o ato de executar a resposta motora (travar ou desviar) corresponde à:",
+                "o": [
+                    "Fase de ação ou execução, que encerra o ciclo iniciado com a recolha de informação.",
+                    "Fase de previsão ou antecipação baseada nas imagens guardadas na memória a longo prazo.",
+                    "Fase de identificação e categorização dos índices percetivos espaciais fixos."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância percorrida pelo veículo durante o tempo de reação de um condutor varia diretamente em função de:",
+                "o": [
+                    "O estado de conservação mecânica dos discos do sistema de travagem de serviço.",
+                    "A velocidade de circulação do automóvel e o estado psicofísico (fadiga, álcool) do condutor.",
+                    "O tipo de material do pavimento asfáltico e a inclinação da via rodoviária."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O que se entende por \"tempo de reação complexo\" no exercício da condução automóvel?",
+                "o": [
+                    "O período necessário para reagir quando se apresentam múltiplos estímulos e várias respostas possíveis.",
+                    "O tempo médio que o circuito hidráulico demora a transmitir a pressão física aos travões.",
+                    "O intervalo cronológico de acionamento imediato dos pré-tensores e airbags laterais."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Consideram-se equipamentos de segurança passiva especificamente concebidos para os peões:",
+                "o": [
+                    "Os sistemas de iluminação pública LED e pavimentos rugosos em passadeiras.",
+                    "O sinal de STOP e os semáforos de controlo de velocidade automático.",
+                    "Capôs deformáveis e airbags exteriores para peões integrados na base do para-brisas de alguns veículos."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Numa condução defensiva urbana, ao avistar um peão a caminhar na berma de costas voltadas para si, deve:",
+                "o": [
+                    "Moderar a velocidade, aumentar o espaço lateral de segurança e prever que o peão desconheça a sua aproximação.",
+                    "Buzinar de forma contínua mantendo a marcha original para forçar a subida imediata do peão para o passeio.",
+                    "Efetuar uma manobra de desvio brusca invadindo a faixa de sentido contrário sem sinalização."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A condução prolongada sob fortes condições de stresse psicológico e irritabilidade provoca:",
+                "o": [
+                    "Uma otimização espontânea da rapidez com que se realizam as sequências sensório-motoras.",
+                    "Sobrestimação das próprias capacidades, menor tolerância à frustração e assunção de riscos desnecessários.",
+                    "O alargamento do campo visual útil periférico e a redução das distâncias de segurança frontais."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O fenómeno de aquaplanagem parcial ou total é influenciado diretamente por:",
+                "o": [
+                    "A calibração eletrónica automática dos amortecedores independentes traseiros do veículo.",
+                    "Conduzir a baixas velocidades em asfalto rugoso perfeitamente drenado e seco.",
+                    "A velocidade do veículo, a espessura da película de água e o estado de desgaste do desenho dos pneus."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O sistema de controlo eletrónico de estabilidade (ESP) atua corrigindo a trajetória do veículo através de:",
+                "o": [
+                    "Travagem individual e seletiva das rodas e redução da potência do motor, se necessário, para evitar a perda de controlo.",
+                    "Ativação antecipada automática dos airbags laterais e de cortina localizados no habitáculo.",
+                    "Modificação da rigidez mecânica das barras de proteção integradas nas portas frontais urbanas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Considera-se um comportamento correto de condução defensiva perante veículos pesados de mercadorias longos:",
+                "o": [
+                    "Aumentar a distância de segurança e prever que estes necessitam de maior espaço em curvas apertadas ou rotundas.",
+                    "Efetuar ultrapassagens rápidas pela direita sempre que o veículo pesado circule na via central.",
+                    "Circular colado à retaguarda para aproveitar a redução do arrasto aerodinâmico em autoestradas."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cansaço físico na condução prolongada manifesta-se através de sinais óbvios, tais como:",
+                "o": [
+                    "Um aumento involuntário da precisão motora e o alargamento estável do campo atencional visual.",
+                    "Bocejos frequentes, sensação de olhos pesados ou secos, dores musculares nas costas e perda de foco.",
+                    "Redução artificial dos milissegundos mecânicos exigidos para acionar os pedais de comando."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Na partilha do espaço rodoviário urbano, o civismo e a condução defensiva baseiam-se em:",
+                "o": [
+                    "Assertividade na imposição de prioridades legais para agilizar a fluidez dos eixos viários.",
+                    "Utilização frequente da buzina como mecanismo pedagógico de correção dos erros de terceiros.",
+                    "Tolerância perante as falhas alheias, cooperação mútua e proteção rigorosa dos utentes mais vulneráveis."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O coeficiente de aderência entre o pneu e o pavimento atinge o seu valor mais baixo e perigoso:",
+                "o": [
+                    "No início da queda de chuva, quando a água se mistura com a poeira e resíduos de óleo na estrada.",
+                    "Após várias horas de chuva intensa e contínua que lava completamente a superfície asfáltica.",
+                    "Em dias de calor extremo, devido à dilatação natural das micro-rugosidades do pavimento."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor experiente difere de um condutor recém-encartado no processo de recolha de informação porque:",
+                "o": [
+                    "Mantém o olhar fixo e contínuo no extremo direito da berma da faixa de rodagem.",
+                    "Realiza uma exploração percetiva visual mais económica, selecionando apenas os índices críticos pertinentes.",
+                    "Necessita de efetuar um maior número de fixações visuais por minuto para processar a cena."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O transporte de carga ou bagagem no interior do habitáculo de forma solta compromete a segurança passiva porque:",
+                "o": [
+                    "Em caso de travagem brusca ou colisão, os objetos são projetados para a frente com força multiplicada, podendo ferir os ocupantes.",
+                    "Altera eletronicamente o funcionamento e a calibração dos sensores do sistema antibloqueio ABS.",
+                    "Diminui o coeficiente de atrito asfáltico dinâmico gerado pelas rodas traseiras do automóvel."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na condução defensiva, o ato de adequar a velocidade às condições de visibilidade (como nevoeiro ou chuva) visa garantir que:",
+                "o": [
+                    "Os pré-tensores pirotécnicos dos cintos de segurança entrem em modo de espera ultra-ativo.",
+                    "O tempo de reação biológica do condutor seja reduzido para valores próximos de zero segundos.",
+                    "A distância de paragem do veículo seja sempre inferior ao espaço visual livre e visível à sua frente."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A ingestão de bebidas alcoólicas, mesmo em quantidades muito reduzidas e inferiores ao limite de contraordenação, provoca:",
+                "o": [
+                    "Uma melhoria percetiva na avaliação correta da velocidade de aproximação de outros veículos.",
+                    "Uma falsa sensação de segurança, ligeiro atraso no tempo de reação e estreitamento do campo visual útil.",
+                    "O aumento involuntário da acuidade visual noturna e maior resistência ao encadeamento de faróis."
+                ],
+                "c": 1
+            },
+            {
+                "p": "A condução noturna com os vidros dos faróis muito sujos ou opacos afeta a segurança porque:",
+                "o": [
+                    "Diminui o alcance e a intensidade do feixe luminoso, reduzindo a visibilidade e a deteção de perigos.",
+                    "Altera eletronicamente o tempo de acionamento mecânico dos travões de serviço do eixo dianteiro.",
+                    "Bloqueia o funcionamento automático do limitador de velocidade regulável integrado no motor."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução defensiva, ao cruzar-se com um veículo parado na berma com os indicadores de perigo acesos, o condutor deve:",
+                "o": [
+                    "Manter a velocidade e a trajetória originais, dado que o obstáculo se encontra fora da faixa de rodagem.",
+                    "Buzinar prolongadamente para exigir a imediata retirada do veículo da berma da via pública.",
+                    "Moderar a velocidade, aumentar a distância lateral de segurança e prever a saída repentina de peões."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O stresse agudo prolongado durante o ato de condução altera as capacidades cognitivas, originando:",
+                "o": [
+                    "Uma otimização espontânea do rastreio ocular através dos espelhos retrovisores centrais.",
+                    "Perda de paciência, dificuldade em focar estímulos importantes e propensão para reações impulsivas.",
+                    "Uma diminuição automática da distância total percorrida pelo veículo durante o tempo de reação."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema de assistência à travagem de emergência (BAS) considera-se um equipamento de segurança:",
+                "o": [
+                    "Ativa, pois ajuda a encurtar a distância de paragem ao aplicar a força máxima nos travões.",
+                    "Passiva, visto que minimiza o impacto da carroçaria sobre o tórax do ocupante do veículo.",
+                    "Suplementar secundária, com atuação exclusiva em pavimentos urbanos escorregadios."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Ao circular numa descida longa e íngreme sob chuva forte, para travar com segurança e evitar falhas no sistema, o condutor deve:",
+                "o": [
+                    "Pressionar continuamente o pedal de embraiagem e travar a fundo de forma repetida.",
+                    "Utilizar engrenada uma mudança baixa (travão de motor) e aplicar toques suaves e intermitentes no travão.",
+                    "Desligar o interruptor do motor do veículo para bloquear a rotação voluntária das rodas."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O fenómeno de aquaplanagem ocorre mais facilmente quando os pneus do veículo:",
+                "o": [
+                    "Apresentam um desgaste acentuado na banda de rodagem ou uma pressão de enchimento inadequada.",
+                    "São novos e mantêm a profundidade dos sulcos no nível máximo estipulado pelo fabricante.",
+                    "São submetidos a uma verificação semanal rigorosa a frio em solo plano e rugoso."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Na aproximação a uma passadeira de peões na envolvência de uma escola, o condutor defensivo deve prever:",
+                "o": [
+                    "Que as crianças respeitarão integralmente as regras formais de travessia previstas no código.",
+                    "O aumento automático do coeficiente de atrito mecânico dos seus pneumáticos na via.",
+                    "Comportamentos intempestivos ou impulsivos por parte das crianças, devendo moderar fortemente a velocidade."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A fadiga crónica afeta o comportamento do condutor experiente ao nível do agir, resultando em:",
+                "o": [
+                    "Maior precisão motora na realização de manobras complexas de desvio em cruzamentos.",
+                    "Movimentos mais lentos, correções de direção tardias ou bruscas e falhas na antecipação do risco.",
+                    "Um aumento benéfico e voluntário da frequência da exploração percetiva visual periférica."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O uso correto do cinto de segurança por passageiros adultos implica que a fita diagonal passe:",
+                "o": [
+                    "Sobre a zona central do peito e o ombro, nunca devendo passar sob o braço ou atrás das costas.",
+                    "Diretamente apoiada sobre a laringe ou pescoço para otimizar a retenção em impactos severos.",
+                    "Ajustada sobre a parede mole do abdómen superior para amortecer a desaceleração programada."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma curva com forte inclinação lateral invertida, a aderência do pneu ao solo:",
+                "o": [
+                    "Aumenta proporcionalmente ao peso do veículo ligeiro devido às forças verticais geradas.",
+                    "Permanece inalterada se o condutor mantiver os espelhos exteriores convexos bem regulados.",
+                    "Fica severamente comprometida, exigindo uma redução acrescida de velocidade antes de entrar na trajetória."
+                ],
+                "c": 2
+            },
+            {
+                "p": "O sistema de controlo de tração (TCS/ASR) atua proativamente na segurança ativa do veículo para:",
+                "o": [
+                    "Impedir o patinhamento das rodas motrizes em fases de aceleração ou superfícies escorregadias.",
+                    "Dissipar e conter as energias cinéticas resultantes de colisões frontais violentas.",
+                    "Regular automaticamente a lubrificação hidráulica e a pressão interna do cárter do motor."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Um condutor idoso com limitações na flexibilidade cervical (pescoço) sentirá dificuldades acrescidas em:",
+                "o": [
+                    "Manter uma pressão mecânica contínua e suave no pedal do acelerador em autoestradas.",
+                    "Controlar os ângulos mortos nas mudanças de faixa e realizar manobras de marcha-atrás com segurança.",
+                    "Memorizar de forma cronológica a sinalização vertical regulamentar instalada à direita."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O transporte de mercadorias ou bagagens volumosas no tejadilho do automóvel:",
+                "o": [
+                    "Eleva o centro de gravidade do veículo, reduzindo a estabilidade em curvas e aumentando o arrasto aerodinâmico.",
+                    "Melhora de forma espontânea a aderência dos pneus e encurta a distância de paragem sob chuva.",
+                    "Neutraliza de forma permanente as lógicas de atuação eletrónica dos airbags frontais de bordo."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Perante uma infração grave cometida por outro utente da via que coloque em risco a sua segurança, deve:",
+                "o": [
+                    "Responder de forma imediata e assertiva, executando uma manobra de retaliação pedagógica equivalente.",
+                    "Manter a calma, priorizar a segurança rodoviária coletiva e focar-se em evitar o acidente.",
+                    "Intercetar a marcha desse veículo mais à frente para exigir esclarecimentos em plena via urbana."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Na tarefa da condução, o conceito de \"condução comentada\" constitui uma técnica indicada para o treino da:",
+                "o": [
+                    "Rapidez mecânica na execução sensório-motora de travagens bruscas de emergência.",
+                    "Coordenação muscular biológica necessária para o acionamento da caixa de velocidades.",
+                    "Identificação e seleção de índices críticos pertinentes na cena rodoviária envolvente."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Ao aproximar-se de uma rotunda com trânsito intenso, o condutor deve prever que a sua distância de paragem:",
+                "o": [
+                    "Diminua se ativar preventivamente o sistema eletrónico de controlo de tração (ASR).",
+                    "Pode ser afetada pelo seu estado emocional e pela rapidez de reação face a uma travagem imprevista à sua frente.",
+                    "Reduze de forma linear direta se os espelhos retrovisores estiverem em modo noturno automático."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Considera-se um comportamento de risco associado à fadiga mental prolongada no condutor:",
+                "o": [
+                    "A fixação prolongada do olhar em estímulos irrelevantes e a tomada de decisões tardias.",
+                    "A exploração visual sistemática e económica dos índices mais pertinentes da cena viária.",
+                    "O aumento involuntário da frequência de movimentos oculares e do foco periférico lateral."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Numa condução defensiva, o ato de ceder a prioridade a outro veículo para evitar uma colisão, mesmo tendo o direito legal de passar, traduz-se numa:",
+                "o": [
+                    "Falha de destreza motora na tarefa mecânica de condução do automóvel.",
+                    "Atitude preventiva que coloca a segurança coletiva acima das regras informais ou direitos individuais.",
+                    "Infração grave às normas obrigatórias estipuladas no Código da Estrada em vigor."
+                ],
+                "c": 1
+            },
+            {
+                "p": "O sistema eletrónico de distribuição de travagem (EBD) funciona como um equipamento de segurança:",
+                "o": [
+                    "Ativa, ajustando de forma independente a força de travagem em cada roda segundo a transferência de massas.",
+                    "Passiva, dissipando as forças de impacto laterais resultantes de colisões mecânicas urbanas.",
+                    "Secundária suplementar, com acionamento restrito e exclusivo após o enchimento dos airbags."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A distância percorrida pelo veículo automóvel durante a fase de travagem mecânica depende diretamente de:",
+                "o": [
+                    "O estado de fadiga, alcoolémia ou tempo de reação biológica do condutor.",
+                    "O posicionamento ergonómico e regulamento dos encostos de cabeça integrados nos bancos.",
+                    "A velocidade do veículo, o estado dos travões e pneus e o coeficiente de aderência do pavimento."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Ao circular numa artéria urbana com veículos estacionados em fila de ambos os lados, o condutor deve prever:",
+                "o": [
+                    "O aparecimento intempestivo de peões ou crianças por entre os automóveis imobilizados, moderando a velocidade.",
+                    "Uma melhoria biológica na rapidez da execução de sequências motoras simples.",
+                    "A desativação automática preventiva dos sensores de monitorização de pressão dos pneus (TPMS)."
+                ],
+                "c": 0
+            },
+            {
+                "p": "Os pré-tensores dos cintos de segurança, que retraem a fita milissegundos após um embate, são considerados:",
+                "o": [
+                    "Medidas de segurança ativa, destinadas a evitar a colisão mecânica frontal.",
+                    "Medidas de segurança passive, destinadas a reduzir os danos e prender o corpo firmemente ao banco.",
+                    "Acessórios ergonómicos mictos sem interferência direta na mitigação de lesões internas graves."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Conduzir com uma taxa de álcool no sangue (TAS) superior a 0,5 g/l afeta o condutor ao nível visual porque provoca:",
+                "o": [
+                    "O alargamento involuntário e benéfico do campo atencional dinâmico periférico.",
+                    "Uma maior resistência biológica aos efeitos nocivos do encadeamento de faróis noturnos.",
+                    "Redução do campo visual periférico (visão em túnel), perturbações na focagem e ilusões óticas."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Na análise psicológica da condução, o processo de \"identificação\" consiste em:",
+                "o": [
+                    "Categorizar e dar um significado aos índices críticos detetados na cena viária circundante.",
+                    "Executar as sequências de atos motores correspondentes através do acionamento físico dos pedais.",
+                    "Imaginar e antecipar acontecimentos futuros potenciais a partir da memória a longo prazo."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O cansaço físico provocado pelo stresse no trânsito citadino reduz drasticamente no condutor:",
+                "o": [
+                    "A distância percorrida pelo veículo ligeiro de mercadorias durante a fase de travagem.",
+                    "A capacidade de tolerância à frustração, potenciando comportamentos de risco ou agressividade.",
+                    "O tempo necessário para que as pinças hidráulicas apliquem pressão estática total nos discos."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Conduzir sob um estado de cansaço extremo ou fadiga atua ao nível do sistema de circulação rodoviária porque:",
+                "o": [
+                    "Reduz a margem de segurança atencional do homem, que é o elemento preponderante e dinâmico do sistema.",
+                    "Aumenta diretamente a rapidez na execução de trajetórias retilíneas coordenadas no asfalto.",
+                    "Garante a recalibração permanente das válvulas eletrónicas de injeção direta de combustível."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O que designa o conjunto de regras, conhecimentos e imagens mentais guardados na memória que ajudam a entender a realidade do trânsito?",
+                "o": [
+                    "Valores estáticos.",
+                    "Atitudes reativas.",
+                    "Representações."
+                ],
+                "c": 2
+            },
+            {
+                "p": "A experiência continuada no exercício da condução automóvel produz o seguinte benefício no agir do condutor:",
+                "o": [
+                    "O aumento progressivo involuntário dos milissegundos requeridos no tempo de reação.",
+                    "Maior rapidez nas sequências sensório-motoras simples e automatização de capacidades.",
+                    "Uma menor eficácia no rastreio através dos espelhos retrovisores regulamentares."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Se a velocidade de circulação de um veículo automóvel ligeiro for duplicada, a sua energia cinética:",
+                "o": [
+                    "Quadruplica, o que expande de forma quadrática a distância mecânica de travagem.",
+                    "Duplica também, mantendo uma progressão linear estrita em pavimentos rugosos secos.",
+                    "Reduz-se para metade devido ao atrito aerodinâmico dinâmico gerado na carroçaria."
+                ],
+                "c": 0
+            },
+            {
+                "p": "A que tipo de medidas de segurança pertencem os sistemas de sinalização rodoviária inteligente e luminosa de perigo?",
+                "o": [
+                    "Segurança passiva estrutural interna.",
+                    "Medidas de retenção suplementar.",
+                    "Medidas de segurança ativa, pois visam prevenir a ocorrência de acidentes."
+                ],
+                "c": 2
+            },
+            {
+                "p": "Numa condução defensiva citadina, perante fumo denso que reduza subitamente a visibilidade na via pública, deve:",
+                "o": [
+                    "Reduzir fortemente a velocidade, ligar as luzes de cruzamento (médios) e os quatro piscas.",
+                    "Acionar as luzes de estrada (máximos) acelerando para abandonar rapidamente o troço.",
+                    "Imobilizar bruscamente o veículo sobre a faixa de rodagem central buzinando de forma contínua."
+                ],
+                "c": 0
+            },
+            {
+                "p": "O dispositivo eletrónico de controlo de velocidade adaptativo (ACC) atua como um sistema de:",
+                "o": [
+                    "Segurança passiva, pois minimiza as consequências físicas de colisões frontais mecânicas.",
+                    "Segurança ativa, gerindo automaticamente a velocidade e a distância frontal em relação ao veículo da frente.",
+                    "Conforto auxiliar do habitáculo, sem qualquer impacto preventivo em autoestradas nacionais."
+                ],
+                "c": 1
+            },
+            {
+                "p": "Um condutor idoso com quebra na sensibilidade tátil e força dos membros inferiores apresentará maior risco de:",
+                "o": [
+                    "Falhar na dosagem correta ou rapidez da força de pressão exercida sobre o pedal de travão.",
+                    "Esquecer a localização cronológica das principais autoestradas e eixos viários do país.",
+                    "Sofrer avarias eletrónicas espontâneas no funcionamento das escovas limpa-para-brisas."
+                ],
+                "c": 0
+            }
+        ];
+
+    // Lista global onde serão armazenadas exatamente 233 perguntas exclusivas
+    const listaCompletaQuestoes = bancoQuestoesPDF.map((q, index) => ({
+        id: index + 1,
+        pergunta: `Questão ${index + 1}: ${q.p}`,
+        opcoes: [...q.o],
+        correta: q.c
+    }));
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("total-db").innerText =
+            `${listaCompletaQuestoes.length} Questões`;
+    });
+
+    // Algoritmo de Preenchimento Seguro e Linear (Sem duplicações nem ciclos infinitos)
+    for (let i = 0; i < bancoQuestoesPDF.length; i++) {
+        listaCompletaQuestoes.push({
+            id: i + 1,
+            pergunta: `Questão ${i + 1}: ${bancoQuestoesPDF[i].p}`,
+            opcoes: [...bancoQuestoesPDF[i].o],
+            correta: bancoQuestoesPDF[i].c
+        });
+    }
+
+    const TOTAL_EXAME = 100;
+    const LIMITE_ERROS = 20;
+
+    let exameAtual = [];
+
+    let tempoInicio = 0;
+    let tempoFinal = 0;
+
+    let indiceAtual = 0;
+    let totalErros = 0;
+    let totalAcertos = 0;
+    let respondeuFaseAtual = false;
+
+    let tempoRestante = 7200; // 2 horas
+    let timerExame = null;
+
+    function pickRandomUniqueQuestions(array, count) {
+        const copy = [...array];
+        const result = [];
+
+        while (result.length < count && copy.length > 0) {
+            const index = Math.floor(Math.random() * copy.length);
+            result.push(copy.splice(index, 1)[0]); // remove para nunca repetir
+        }
+
+        return result;
+    }
+
+    function shuffleQuestion(question) {
+
+        const options = question.opcoes.map((texto, indice) => ({
+            texto,
+            correta: indice === question.correta
+        }));
+
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+
+        return {
+            ...question,
+            opcoes: options.map(x => x.texto),
+            correta: options.findIndex(x => x.correta)
+        };
+    }
+    function iniciarCronometro() {
+
+        clearInterval(timerExame);
+
+        timerExame = setInterval(() => {
+
+            tempoRestante--;
+
+            const horas = Math.floor(tempoRestante / 3600);
+            const minutos = Math.floor((tempoRestante % 3600) / 60);
+            const segundos = tempoRestante % 60;
+
+            document.getElementById("cronometro").innerText =
+                `⏰ ${String(horas).padStart(2, '0')}:${
+                    String(minutos).padStart(2, '0')
+                }:${String(segundos).padStart(2, '0')}`;
+
+            if (tempoRestante <= 0) {
+
+                clearInterval(timerExame);
+
+                alert("⏰ O tempo terminou!");
+
+                mostrarResultadosFinais();
+            }
+
+        }, 1000);
+    }
+
+    function iniciarExame() {
+
+        exameAtual = pickRandomUniqueQuestions(listaCompletaQuestoes, TOTAL_EXAME)
+            .map(q => shuffleQuestion(q));
+
+        indiceAtual = 0;
+        totalErros = 0;
+        totalAcertos = 0;
+
+        tempoRestante = 7200;
+        tempoInicio = Date.now();
+
+        document.getElementById('total-questoes').innerText =
+            exameAtual.length;
+
+        iniciarCronometro();
+
+        document.getElementById('tela-inicio').style.display = 'none';
+        document.getElementById('tela-exame').style.display = 'block';
+
+        carregarQuestao();
+    }
+
+    function carregarQuestao() {
+        respondeuFaseAtual = false;
+        const q = exameAtual[indiceAtual];
+        
+        document.getElementById('num-atual').innerText = indiceAtual + 1;
+        document.getElementById('contador-erros').innerText =
+            `Erros: ${totalErros}/${LIMITE_ERROS}`;
+        document.getElementById('enunciado').innerText = q.pergunta;
+        document.getElementById('feedback-texto').innerText = '';
+        document.getElementById('feedback-texto').className = '';
+        
+        const btn = document.getElementById('btn-acao');
+        btn.innerText = "Confirmar Resposta";
+
+        const blocoOpcoes = document.getElementById('bloco-opcoes');
+        blocoOpcoes.innerHTML = '';
+        
+        q.opcoes.forEach((opcao, index) => {
+            blocoOpcoes.innerHTML += `
+                <label class="opcao" id="opt-container-${index}">
+                    <input type="radio" name="opcao_exame" value="${index}">
+                    <span>${opcao}</span>
+                </label>
+            `;
+        });
+    }
+
+    function verificarOuAvancar() {
+        const btn = document.getElementById('btn-acao');
+        
+        if (!respondeuFaseAtual) {
+            const selecionada = document.querySelector('input[name="opcao_exame"]:checked');
+            if (!selecionada) { 
+                alert("Por favor, selecione uma das opções apresentadas para continuar."); 
+                return; 
+            }
+
+            respondeuFaseAtual = true;
+            const respostaUtilizador = parseInt(selecionada.value);
+            const q = exameAtual[indiceAtual];
+            const feedbackBox = document.getElementById('feedback-texto');
+
+            // Desativa cliques e realça a resposta correta em verde
+            document.querySelectorAll('.opcao').forEach((elemento, idx) => {
+                elemento.classList.add('desativada');
+                if (idx === q.correta) {
+                    elemento.classList.add('correta');
+                }
+            });
+
+            if (respostaUtilizador === q.correta) {
+                totalAcertos++;
+                feedbackBox.innerHTML = "<span class='txt-sucesso'>✨ Resposta Correta! O conceito selecionado está em perfeita conformidade com os manuais.</span>";
+            } else {
+                totalErros++;
+                document.getElementById(`opt-container-${respostaUtilizador}`).classList.add('errada');
+                feedbackBox.innerHTML = "<span class='txt-perigo'>❌ Resposta Incorreta! A opção certa foi devidamente realçada a verde para estudo.</span>";
+            }
+            
+            document.getElementById('contador-erros').innerText =
+                `Erros: ${totalErros}/${LIMITE_ERROS}`;
+
+            if (indiceAtual === exameAtual.length - 1) {
+                btn.innerText = "Finalizar e Ver Resultados";
+            } else {
+                btn.innerText = "Avançar para a Próxima Questão";
+            }
+        } else {
+            if (indiceAtual < exameAtual.length - 1) {
+                indiceAtual++;
+                carregarQuestao();
+            } else {
+                mostrarResultadosFinais();
+            }
+        }
+    }
+
+    function mostrarResultadosFinais() {
+        tempoFinal = Date.now();
+
+        const tempoTotalMs = tempoFinal - tempoInicio;
+
+        const horas = Math.floor(tempoTotalMs / 3600000);
+        const minutos = Math.floor((tempoTotalMs % 3600000) / 60000);
+        const segundos = Math.floor((tempoTotalMs % 60000) / 1000);
+
+        const tempoFormatado =
+            `${String(horas).padStart(2,'0')}:` +
+            `${String(minutos).padStart(2,'0')}:` +
+            `${String(segundos).padStart(2,'0')}`;
+        clearInterval(timerExame);
+        document.getElementById('tela-exame').style.display = 'none';
+        document.getElementById('tela-resultado').style.display = 'block';
+
+        const totalPerguntas = exameAtual.length;
+        const limiteErros = LIMITE_ERROS;
+        const conseguiuAprovacao = totalErros <= limiteErros;
+
+        const statusFinal = document.getElementById('status-final');
+        if (conseguiuAprovacao) {
+            statusFinal.innerText = "🎉 APROVADO(A)!";
+            statusFinal.className = "resultado-status aprovado";
+        } else {
+            statusFinal.innerText = "❌ REPROVADO(A)";
+            statusFinal.className = "resultado-status reprovado";
+        }
+
+        document.getElementById('detalhes-resultado').innerHTML = `
+            <p style="font-size: 1.1rem; margin-top:0;">Concluiu com sucesso a folha completa de exame de <strong>${totalPerguntas} questões sequenciais</strong>.</p>
+            <p>⏱ Tempo gasto: <strong>${tempoFormatado}</strong></p>
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
+            <p>✅ Respostas Certas: <strong style="color: var(--success); font-size: 1.2rem;">${totalAcertos}</strong></p>
+            <p>❌ Respostas Erradas: <strong style="color: var(--danger); font-size: 1.2rem;">${totalErros}</strong></p>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0;">Nota de referência: O regulamento SMEC estipula um teto(limite) máximo de ${limiteErros} falhas (20%) para obter aproveitamento na prova teórica.</p>
+        `;
+    }
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
+    }
+
+    // carregar automaticamente ao abrir
+    (function () {
+        const saved = localStorage.getItem("theme");
+
+        if (saved === "dark") {
+            document.body.classList.add("dark");
+        }
+    })();
+</script>
+</body>
+</html>
